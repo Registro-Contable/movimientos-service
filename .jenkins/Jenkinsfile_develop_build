@@ -1,0 +1,79 @@
+pipeline {
+    agent any
+
+    tools {
+        maven "M3"
+    }
+
+    environment {
+        NAME = "movimientos-service"
+        
+        GIT_REPO = "https://github.com/Registro-Contable/${NAME}"
+        BRANCH = "develop"
+
+        DOCKER_NAME = "registro-contable/${NAME}"
+        DOCKER_REPO = "192.168.1.5:8082"
+        
+        TEST_CONF_PROFILE = "development"
+        TEST_CONF_URL = "http://192.168.1.5:8888"
+        BUILD_PROFILE = "build"
+    }
+
+    stages {
+        stage('pre-run') {
+            steps {
+                cleanWs()
+            }
+        }
+        stage('checkout') {
+            steps {
+                git branch: "${BRANCH}", credentialsId: "${CREDENTIALS_GITHUB}", url: "${GIT_REPO}"
+            }
+        }
+        stage('init-var') {
+            steps{
+                script{
+                    VERSION = sh(script: 'mvn help:evaluate -Dexpression=project.version -q -DforceStdout', returnStdout: true).trim()
+                }
+            }                
+        }
+        stage('validate-test') {
+            steps {
+                sh "mvn -B clean verify -Dspring.cloud.config.profile=${TEST_CONF_PROFILE} -Dspring.cloud.config.uri=${TEST_CONF_URL} -Dspring.profiles.active=${BUILD_PROFILE}"
+            }
+        }
+        stage('build-artifacts') {
+            steps {
+                configFileProvider([configFile(fileId: 'a7295949-125b-4521-97ab-e3b633a850c2', variable: 'MAVEN_SETTINGS')]) {
+                    sh "mvn -s ${MAVEN_SETTINGS} -B clean deploy -DskipTests -Dmaven.test.failure.ignore=true"
+                }
+            }
+        }
+        stage('build-docker') {
+            steps {
+                sh "docker build -t ${DOCKER_NAME}:${VERSION} ."
+            }
+        }
+        stage('run-docker') {
+            steps {
+                sh "echo TAG=${VERSION} > docker-compose.env"
+                sh "docker-compose --env-file docker-compose.env up -d"
+            }
+        }
+        stage('push-docker') {
+            steps {
+                withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: "${CREDENTIALS_NEXUS}", usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
+                    sh "docker login -u ${USERNAME} -p ${PASSWORD} ${DOCKER_REPO}"
+                    sh "docker tag ${DOCKER_NAME}:${VERSION} ${DOCKER_REPO}/${DOCKER_NAME}:${VERSION}"
+                    sh "docker push ${DOCKER_REPO}/${DOCKER_NAME}:${VERSION}"
+                }
+                
+            }
+        }
+        stage('clean-docker') {
+            steps {
+                sh " docker image prune -f"
+            }
+        }
+    }
+}
