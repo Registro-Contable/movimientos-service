@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: movimientos-service
+      cloud:    config:
+      profile: local      uri:      - http://localhost:8888
