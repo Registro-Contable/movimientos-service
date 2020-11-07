@@ -8,6 +8,7 @@ import com.victorlh.registrocontable.movimientosservice.domain.conf.ETipoMovimie
 public class Movimiento {
 
 	private Long id;
+	private String uid;
 	private Date fecha;
 	private ETipoMovimiento tipoMovimiento;
 	private String categoriaId;
@@ -30,6 +31,14 @@ public class Movimiento {
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+
+	public String getUid() {
+		return uid;
+	}
+
+	public void setUid(String uid) {
+		this.uid = uid;
 	}
 
 	public Date getFecha() {

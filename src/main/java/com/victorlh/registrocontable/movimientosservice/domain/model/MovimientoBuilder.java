@@ -15,7 +15,7 @@ public class MovimientoBuilder {
 	private double cantidad;
 	private String concepto;
 	private String nota;
-	private boolean isMovimientoContable;
+	private Boolean isMovimientoContable;
 
 	private List<Movimiento> movimietosAsociados;
 
@@ -91,11 +91,11 @@ public class MovimientoBuilder {
 		this.movimietosAsociados = movimietosAsociados;
 	}
 
-	public boolean isMovimientoContable() {
+	public Boolean isMovimientoContable() {
 		return isMovimientoContable;
 	}
 
-	public void setMovimientoContable(boolean isMovimientoContable) {
+	public void setMovimientoContable(Boolean isMovimientoContable) {
 		this.isMovimientoContable = isMovimientoContable;
 	}
 

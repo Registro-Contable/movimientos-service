@@ -22,6 +22,7 @@ public interface MovimientosEntityMapper {
 	List<Movimiento> listMovimientosEntityToListMovimientos(List<MovimientoEntity> list);
 	
 	@Mapping(target = "id", ignore = true)
+	@Mapping(target = "uid", ignore = true)
 	@Mapping(target = "capitalPosterior", ignore = true)
 	@Mapping(target = "capitalPrevio", ignore = true)
 	@Mapping(target = "tipoMovimientoId", source = "builder.tipoMovimiento")
@@ -31,4 +32,5 @@ public interface MovimientosEntityMapper {
 	default ETipoMovimiento idToTipoMovimiento(String tipoMovimientoId) {
 		return ETipoMovimiento.findById(tipoMovimientoId).orElse(null);
 	}
+	
 }

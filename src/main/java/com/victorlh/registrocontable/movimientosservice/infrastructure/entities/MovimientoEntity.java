@@ -22,6 +22,9 @@ public class MovimientoEntity {
 
 	@Column(name = "tipo_movimiento_id", length = 30, nullable = false)
 	private String tipoMovimientoId;
+	
+	@Column(name = "uid", nullable = false)
+	private String uid;
 
 	@Column(name = "cuenta_id")
 	private String cuentaId;
@@ -30,7 +33,7 @@ public class MovimientoEntity {
 	private String medioPagoId;
 
 	@Column(nullable = false)
-	private Double cantidad;
+	private double cantidad;
 
 	@Column(name = "categoria_id")
 	private String categoriaId;
@@ -56,6 +59,14 @@ public class MovimientoEntity {
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+	
+	public String getUid() {
+		return uid;
+	}
+	
+	public void setUid(String uid) {
+		this.uid = uid;
 	}
 
 	public Date getFecha() {
@@ -90,11 +101,11 @@ public class MovimientoEntity {
 		this.medioPagoId = medioPagoId;
 	}
 
-	public Double getCantidad() {
+	public double getCantidad() {
 		return cantidad;
 	}
 
-	public void setCantidad(Double cantidad) {
+	public void setCantidad(double cantidad) {
 		this.cantidad = cantidad;
 	}
 
