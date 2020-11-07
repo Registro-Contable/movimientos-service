@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd
+    http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+	<changeSet author="victorlh" id="20201107-001">
+		<createTable tableName="movimientos"
+			schemaName="movimientos">
+			<column autoIncrement="true" name="id" type="SERIAL">
+				<constraints primaryKey="true" />
+			</column>
+			<column name="fecha" type="TIMESTAMP">
+				<constraints nullable="false" />
+			</column>
+			<column name="tipo_movimiento_id" type="VARCHAR(30)">
+				<constraints nullable="false" />
+			</column>
+			<column name="cuenta_id" type="VARCHAR(255)" />
+			<column name="medio_pago_id" type="VARCHAR(255)" />
+			<column name="cantidad" type="CURRENCY">
+				<constraints nullable="false" />
+			</column>
+			<column name="categoria_id" type="VARCHAR(255)" />
+			<column name="concepto" type="VARCHAR(255)" />
+			<column name="nota" type="VARCHAR" />
+			<column name="is_movimiento_contable" type="BOOLEAN">
+				<constraints nullable="false" />
+			</column>
+			<column name="capital_previo" type="CURRENCY" />
+			<column name="capital_posterior" type="CURRENCY" />
+		</createTable>
+		<rollback>
+			<dropTable tableName="movimientos" schemaName="movimientos" />
+		</rollback>
+	</changeSet>
+
+</databaseChangeLog>

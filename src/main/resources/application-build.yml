@@ -1,0 +1,6 @@
+server:
+  port: ${PORT:0}
+  
+spring:
+  liquibase:
+    enabled: false
