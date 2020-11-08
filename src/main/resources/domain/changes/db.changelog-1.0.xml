@@ -6,7 +6,7 @@
 	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd
     http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
-	<changeSet author="victorlh" id="20201107-001">
+	<changeSet author="victorlh" id="movimientos-service-20201107-001">
 		<createTable tableName="movimientos"
 			schemaName="movimientos">
 			<column autoIncrement="true" name="id" type="SERIAL">

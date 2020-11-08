@@ -7,8 +7,8 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.ComponentScans;
 
 @SpringBootApplication
-@ComponentScans(value = { @ComponentScan("com.victorlh.registrocontable.common.securitycommon") })
 @EnableFeignClients
+@ComponentScans(value = { @ComponentScan("com.victorlh.registrocontable.common.securitycommon") })
 public class MovimientosServiceApplication {
 
 	public static void main(String[] args) {

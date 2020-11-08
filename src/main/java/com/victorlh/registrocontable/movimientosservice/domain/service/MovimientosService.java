@@ -9,13 +9,13 @@ import com.victorlh.registrocontable.movimientosservice.domain.model.MovimientoB
 
 public interface MovimientosService {
 
-	public List<Movimiento> getMovimientosUsuario(String uid, Date desde, Date hasta);
+	public List<Movimiento> getMovimientosUsuario(String uid, Date fromDate, Date toDate);
 
-	public List<Movimiento> getMovimientosCuenta(String cuentaId, Date desde, Date hasta);
+	public List<Movimiento> getMovimientosCuenta(String cuentaId, Date fromDate, Date toDate);
 
-	public List<Movimiento> getMovimientosUsuario(String uid, Date desde, Date hasta, ETipoMovimiento tipoMovimiento);
+	public List<Movimiento> getMovimientosUsuario(String uid, Date fromDate, Date toDate, ETipoMovimiento tipoMovimiento);
 
-	public List<Movimiento> getMovimientosCuenta(String cuentaId, Date desde, Date hasta, ETipoMovimiento tipoMovimiento);
+	public List<Movimiento> getMovimientosCuenta(String cuentaId, Date fromDate, Date toDate, ETipoMovimiento tipoMovimiento);
 
 	public Movimiento nuevoMovimiento(String uid, MovimientoBuilder builder);
 	

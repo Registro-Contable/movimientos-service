@@ -11,21 +11,21 @@ import com.victorlh.registrocontable.movimientosservice.infrastructure.entities.
 
 public interface MovimientosRepository extends JpaRepository<MovimientoEntity, Long> {
 
-	@Query("From MovimientoEntity m WHERE m.uid = :uid and fecha >= :desde and fecha <= :hasta ORDER BY fecha ASC")
-	List<MovimientoEntity> findByUidAndDates(String uid, Date desde, Date hasta);
+	@Query("select m from MovimientoEntity m WHERE m.uid = :uid and fecha >= :fromDate and fecha <= :toDate ORDER BY fecha ASC")
+	List<MovimientoEntity> findByUidAndDates(String uid, Date fromDate, Date toDate);
 	
-	@Query("From MovimientoEntity m where m.cuentaId = :cuentaId and fecha >= :desde and fecha <= :hasta ORDER BY fecha ASC")
-	List<MovimientoEntity> findByCuentaIdAndDates(String cuentaId, Date desde, Date hasta);
+	@Query("select m from MovimientoEntity m where m.cuentaId = :cuentaId and fecha >= :fromDate and fecha <= :toDate ORDER BY fecha ASC")
+	List<MovimientoEntity> findByCuentaIdAndDates(String cuentaId, Date fromDate, Date toDate);
 	
-	@Query("From MovimientoEntity m where m.uid = :uid and tipoMovimientoId = :tipoMovimientoId and fecha >= :desde and fecha <= :hasta ORDER BY fecha ASC")
-	List<MovimientoEntity> findByUidAndTipoMovimientoAndDates(String uid, String tipoMovimientoId, Date desde, Date hasta);
+	@Query("select m from MovimientoEntity m where m.uid = :uid and tipoMovimientoId = :tipoMovimientoId and fecha >= :fromDate and fecha <= :toDate ORDER BY fecha ASC")
+	List<MovimientoEntity> findByUidAndTipoMovimientoAndDates(String uid, String tipoMovimientoId, Date fromDate, Date toDate);
 	
-	@Query("From MovimientoEntity m where m.cuentaId = :cuentaId and tipoMovimientoId = :tipoMovimientoId and fecha >= :desde and fecha <= :hasta ORDER BY fecha ASC")
-	List<MovimientoEntity> findByCuentaIdAndTipoMovimientoAndDates(String cuentaId, String tipoMovimientoId, Date desde, Date hasta);
+	@Query("select m from MovimientoEntity m where m.cuentaId = :cuentaId and tipoMovimientoId = :tipoMovimientoId and fecha >= :fromDate and fecha <= :toDate ORDER BY fecha ASC")
+	List<MovimientoEntity> findByCuentaIdAndTipoMovimientoAndDates(String cuentaId, String tipoMovimientoId, Date fromDate, Date toDate);
 
-	@Query("From MovimientoEntity m WHERE m.cuentaId = :cuentaId and fecha < :fecha ORDER BY fecha DESC LIMIT 1")
+	@Query("select m from MovimientoEntity m WHERE m.cuentaId = :cuentaId and fecha < :fecha ORDER BY fecha DESC LIMIT 1")
 	Optional<MovimientoEntity> findMovimientoPrevio(String cuentaId, Date fecha);
 	
-	@Query("From MovimientoEntity m WHERE m.cuentaId = :cuentaId and fecha > :fecha ORDER BY fecha ASC")
+	@Query("select m from MovimientoEntity m WHERE m.cuentaId = :cuentaId and fecha > :fecha ORDER BY fecha ASC")
 	List<MovimientoEntity> findMovimientosPosteriores(String cuentaId, Date fecha);
 }

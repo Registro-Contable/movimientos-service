@@ -1,5 +1,7 @@
 package com.victorlh.registrocontable.movimientosservice.mappers;
 
+import java.util.List;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -15,6 +17,8 @@ public interface MovimientosApiMapper {
 
 	@Mapping(target = "tipoMovimientoId", source = "movimiento.tipoMovimiento")
 	MovimientoResponseDTO movimientoToMovimientoResponse(Movimiento movimiento);
+	
+	List<MovimientoResponseDTO> listaMovimientosToListaMovimientosResponse(List<Movimiento> movimientos);
 	
 	@Mapping(target = "movimientoContable", ignore = true)
 	@Mapping(target = "movimietosAsociados", ignore = true)

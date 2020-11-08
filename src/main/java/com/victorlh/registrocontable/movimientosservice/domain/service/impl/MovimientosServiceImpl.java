@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.victorlh.registrocontable.movimientosservice.domain.conf.ETipoMovimiento;
 import com.victorlh.registrocontable.movimientosservice.domain.model.Movimiento;
@@ -18,6 +19,7 @@ import com.victorlh.registrocontable.movimientosservice.infrastructure.feign.dto
 import com.victorlh.registrocontable.movimientosservice.infrastructure.repositories.MovimientosRepository;
 import com.victorlh.registrocontable.movimientosservice.mappers.MovimientosEntityMapper;
 
+@Service
 public class MovimientosServiceImpl implements MovimientosService {
 
 	@Autowired
@@ -28,43 +30,43 @@ public class MovimientosServiceImpl implements MovimientosService {
 	private TiposCuentasFeign tipoCuentasFeign;
 
 	@Override
-	public List<Movimiento> getMovimientosUsuario(String uid, Date desde, Date hasta) {
-		desde = desde != null ? desde : Date.from(Instant.MIN);
-		hasta = hasta != null ? hasta : Date.from(Instant.MAX);
+	public List<Movimiento> getMovimientosUsuario(String uid, Date fromDate, Date toDate) {
+		fromDate = fromDate != null ? fromDate : Date.from(Instant.MIN);
+		toDate = toDate != null ? toDate : Date.from(Instant.MAX);
 
-		List<MovimientoEntity> movimientosEntities = movimientosRepository.findByUidAndDates(uid, desde, hasta);
-
-		return movimientosEntityMapper.listMovimientosEntityToListMovimientos(movimientosEntities);
-	}
-
-	@Override
-	public List<Movimiento> getMovimientosCuenta(String cuentaId, Date desde, Date hasta) {
-		desde = desde != null ? desde : Date.from(Instant.MIN);
-		hasta = hasta != null ? hasta : Date.from(Instant.MAX);
-
-		List<MovimientoEntity> movimientosEntities = movimientosRepository.findByCuentaIdAndDates(cuentaId, desde, hasta);
+		List<MovimientoEntity> movimientosEntities = movimientosRepository.findByUidAndDates(uid, fromDate, toDate);
 
 		return movimientosEntityMapper.listMovimientosEntityToListMovimientos(movimientosEntities);
 	}
 
 	@Override
-	public List<Movimiento> getMovimientosUsuario(String uid, Date desde, Date hasta, ETipoMovimiento tipoMovimiento) {
-		desde = desde != null ? desde : Date.from(Instant.MIN);
-		hasta = hasta != null ? hasta : Date.from(Instant.MAX);
+	public List<Movimiento> getMovimientosCuenta(String cuentaId, Date fromDate, Date toDate) {
+		fromDate = fromDate != null ? fromDate : Date.from(Instant.MIN);
+		toDate = toDate != null ? toDate : Date.from(Instant.MAX);
 
-		List<MovimientoEntity> movimientosEntities = movimientosRepository.findByUidAndTipoMovimientoAndDates(uid, tipoMovimiento.name(), desde,
-				hasta);
+		List<MovimientoEntity> movimientosEntities = movimientosRepository.findByCuentaIdAndDates(cuentaId, fromDate, toDate);
 
 		return movimientosEntityMapper.listMovimientosEntityToListMovimientos(movimientosEntities);
 	}
 
 	@Override
-	public List<Movimiento> getMovimientosCuenta(String cuentaId, Date desde, Date hasta, ETipoMovimiento tipoMovimiento) {
-		desde = desde != null ? desde : Date.from(Instant.MIN);
-		hasta = hasta != null ? hasta : Date.from(Instant.MAX);
+	public List<Movimiento> getMovimientosUsuario(String uid, Date fromDate, Date toDate, ETipoMovimiento tipoMovimiento) {
+		fromDate = fromDate != null ? fromDate : Date.from(Instant.MIN);
+		toDate = toDate != null ? toDate : Date.from(Instant.MAX);
+
+		List<MovimientoEntity> movimientosEntities = movimientosRepository.findByUidAndTipoMovimientoAndDates(uid, tipoMovimiento.name(), fromDate,
+				toDate);
+
+		return movimientosEntityMapper.listMovimientosEntityToListMovimientos(movimientosEntities);
+	}
+
+	@Override
+	public List<Movimiento> getMovimientosCuenta(String cuentaId, Date fromDate, Date toDate, ETipoMovimiento tipoMovimiento) {
+		fromDate = fromDate != null ? fromDate : Date.from(Instant.MIN);
+		toDate = toDate != null ? toDate : Date.from(Instant.MAX);
 
 		List<MovimientoEntity> movimientosEntities = movimientosRepository.findByCuentaIdAndTipoMovimientoAndDates(cuentaId, tipoMovimiento.name(),
-				desde, hasta);
+				fromDate, toDate);
 
 		return movimientosEntityMapper.listMovimientosEntityToListMovimientos(movimientosEntities);
 	}
