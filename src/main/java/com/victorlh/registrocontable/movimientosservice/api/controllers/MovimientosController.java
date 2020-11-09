@@ -23,7 +23,7 @@ import com.victorlh.registrocontable.movimientosservice.domain.service.Movimient
 import com.victorlh.registrocontable.movimientosservice.mappers.MovimientosApiMapper;
 
 @RestController
-@RequestMapping("/")
+@RequestMapping
 public class MovimientosController {
 
 	@Autowired

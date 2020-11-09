@@ -1,7 +1,7 @@
 package com.victorlh.registrocontable.movimientosservice.domain.service.impl;
 
-import java.time.Instant;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,42 +31,42 @@ public class MovimientosServiceImpl implements MovimientosService {
 
 	@Override
 	public List<Movimiento> getMovimientosUsuario(String uid, Date fromDate, Date toDate) {
-		fromDate = fromDate != null ? fromDate : Date.from(Instant.MIN);
-		toDate = toDate != null ? toDate : Date.from(Instant.MAX);
+		fromDate = fromDate != null ? fromDate : minDate();
+		toDate = toDate != null ? toDate : maxDate();
 
-		List<MovimientoEntity> movimientosEntities = movimientosRepository.findByUidAndDates(uid, fromDate, toDate);
+		List<MovimientoEntity> movimientosEntities = movimientosRepository.findByUidAndFechaBetweenOrderByFechaAsc(uid, fromDate, toDate);
 
 		return movimientosEntityMapper.listMovimientosEntityToListMovimientos(movimientosEntities);
 	}
 
 	@Override
 	public List<Movimiento> getMovimientosCuenta(String cuentaId, Date fromDate, Date toDate) {
-		fromDate = fromDate != null ? fromDate : Date.from(Instant.MIN);
-		toDate = toDate != null ? toDate : Date.from(Instant.MAX);
-
-		List<MovimientoEntity> movimientosEntities = movimientosRepository.findByCuentaIdAndDates(cuentaId, fromDate, toDate);
+		fromDate = fromDate != null ? fromDate : minDate();
+		toDate = toDate != null ? toDate : maxDate();
+		
+		List<MovimientoEntity> movimientosEntities = movimientosRepository.findByCuentaIdAndFechaBetweenOrderByFechaAsc(cuentaId, fromDate, toDate);
 
 		return movimientosEntityMapper.listMovimientosEntityToListMovimientos(movimientosEntities);
 	}
 
 	@Override
 	public List<Movimiento> getMovimientosUsuario(String uid, Date fromDate, Date toDate, ETipoMovimiento tipoMovimiento) {
-		fromDate = fromDate != null ? fromDate : Date.from(Instant.MIN);
-		toDate = toDate != null ? toDate : Date.from(Instant.MAX);
+		fromDate = fromDate != null ? fromDate : minDate();
+		toDate = toDate != null ? toDate : maxDate();
 
-		List<MovimientoEntity> movimientosEntities = movimientosRepository.findByUidAndTipoMovimientoAndDates(uid, tipoMovimiento.name(), fromDate,
-				toDate);
+		List<MovimientoEntity> movimientosEntities = movimientosRepository.findByUidAndTipoMovimientoIdAndFechaBetweenOrderByFechaAsc(uid,
+				tipoMovimiento.name(), fromDate, toDate);
 
 		return movimientosEntityMapper.listMovimientosEntityToListMovimientos(movimientosEntities);
 	}
 
 	@Override
 	public List<Movimiento> getMovimientosCuenta(String cuentaId, Date fromDate, Date toDate, ETipoMovimiento tipoMovimiento) {
-		fromDate = fromDate != null ? fromDate : Date.from(Instant.MIN);
-		toDate = toDate != null ? toDate : Date.from(Instant.MAX);
+		fromDate = fromDate != null ? fromDate : minDate();
+		toDate = toDate != null ? toDate : maxDate();
 
-		List<MovimientoEntity> movimientosEntities = movimientosRepository.findByCuentaIdAndTipoMovimientoAndDates(cuentaId, tipoMovimiento.name(),
-				fromDate, toDate);
+		List<MovimientoEntity> movimientosEntities = movimientosRepository.findByCuentaIdAndTipoMovimientoIdAndFechaBetweenOrderByFechaAsc(cuentaId,
+				tipoMovimiento.name(), fromDate, toDate);
 
 		return movimientosEntityMapper.listMovimientosEntityToListMovimientos(movimientosEntities);
 	}
@@ -83,7 +83,8 @@ public class MovimientosServiceImpl implements MovimientosService {
 
 		entity = updateCapitalAndSave(entity);
 
-		List<MovimientoEntity> posterioresEntities = movimientosRepository.findMovimientosPosteriores(entity.getCuentaId(), entity.getFecha());
+		List<MovimientoEntity> posterioresEntities = movimientosRepository.findByCuentaIdAndFechaGreaterThanOrderByFechaAsc(entity.getCuentaId(),
+				entity.getFecha());
 		posterioresEntities.forEach(e -> {
 			updateCapitalAndSave(e);
 		});
@@ -111,7 +112,8 @@ public class MovimientosServiceImpl implements MovimientosService {
 
 			entity = updateCapitalAndSave(entity);
 
-			List<MovimientoEntity> posterioresEntities = movimientosRepository.findMovimientosPosteriores(entity.getCuentaId(), entity.getFecha());
+			List<MovimientoEntity> posterioresEntities = movimientosRepository.findByCuentaIdAndFechaGreaterThanOrderByFechaAsc(entity.getCuentaId(),
+					entity.getFecha());
 			posterioresEntities.forEach(e -> {
 				updateCapitalAndSave(e);
 			});
@@ -124,7 +126,7 @@ public class MovimientosServiceImpl implements MovimientosService {
 	public void borrarMovimiento(Movimiento movimiento) {
 		movimientosRepository.deleteById(movimiento.getId());
 
-		List<MovimientoEntity> posterioresEntities = movimientosRepository.findMovimientosPosteriores(movimiento.getCuentaId(),
+		List<MovimientoEntity> posterioresEntities = movimientosRepository.findByCuentaIdAndFechaGreaterThanOrderByFechaAsc(movimiento.getCuentaId(),
 				movimiento.getFecha());
 		posterioresEntities.forEach(e -> {
 			updateCapitalAndSave(e);
@@ -132,7 +134,8 @@ public class MovimientosServiceImpl implements MovimientosService {
 	}
 
 	private MovimientoEntity updateCapitalAndSave(MovimientoEntity entity) {
-		Optional<MovimientoEntity> previoEntityOpt = movimientosRepository.findMovimientoPrevio(entity.getCuentaId(), entity.getFecha());
+		Optional<MovimientoEntity> previoEntityOpt = movimientosRepository.findFirstByCuentaIdAndFechaLessThanOrderByFechaDesc(entity.getCuentaId(),
+				entity.getFecha());
 		double capitalPrevio = 0;
 		if (previoEntityOpt.isPresent()) {
 			MovimientoEntity previoEntity = previoEntityOpt.get();
@@ -141,6 +144,14 @@ public class MovimientosServiceImpl implements MovimientosService {
 		entity.setCapitalPrevio(capitalPrevio);
 		entity.setCapitalPosterior(capitalPrevio + entity.getCantidad());
 		return movimientosRepository.save(entity);
+	}
+	
+	private Date minDate() {
+		return new GregorianCalendar(1900, 0, 1).getTime();
+	}
+	
+	private Date maxDate() {
+		return new GregorianCalendar(2900, 11, 31).getTime();
 	}
 
 }
