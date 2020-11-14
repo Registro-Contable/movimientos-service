@@ -39,21 +39,29 @@ public class MovimientosController {
 	private MovimientosApiMapper movimientosApiMapper;
 
 	@GetMapping({ "/", "" })
-	public List<MovimientoResponseDTO> listaMovimientos(@RequestParam(name = "tipoMovimiento") String tipoMovimientoId,
+	public List<MovimientoResponseDTO> listaMovimientos(@RequestParam(name = "tipoMovimiento", required = false) String tipoMovimientoId,
 			@RequestParam(name = "cuentaId", required = false) String cuentaId,
 			@RequestParam(value = "fromDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date fromDate,
 			@RequestParam(value = "toDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date toDate, Authentication auth) {
 		String uid = (String) auth.getPrincipal();
 
 		Optional<ETipoMovimiento> tipoMovimientoOpt = ETipoMovimiento.findById(tipoMovimientoId);
-		ETipoMovimiento tipoMovimiento = tipoMovimientoOpt
-				.orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "El tipo de movimiento no es valido"));
 
 		List<Movimiento> movimientos;
-		if (StringUtils.isEmpty(cuentaId)) {
-			movimientos = movimientoService.getMovimientosUsuario(uid, fromDate, toDate, tipoMovimiento);
+
+		if (tipoMovimientoOpt.isPresent()) {
+			ETipoMovimiento tipoMovimiento = tipoMovimientoOpt.get();
+			if (StringUtils.isEmpty(cuentaId)) {
+				movimientos = movimientoService.getMovimientosUsuario(uid, fromDate, toDate, tipoMovimiento);
+			} else {
+				movimientos = movimientoService.getMovimientosCuenta(cuentaId, fromDate, toDate, tipoMovimiento);
+			}
 		} else {
-			movimientos = movimientoService.getMovimientosCuenta(cuentaId, fromDate, toDate, tipoMovimiento);
+			if (StringUtils.isEmpty(cuentaId)) {
+				movimientos = movimientoService.getMovimientosUsuario(uid, fromDate, toDate);
+			} else {
+				movimientos = movimientoService.getMovimientosCuenta(cuentaId, fromDate, toDate);
+			}
 		}
 
 		return movimientosApiMapper.listaMovimientosToListaMovimientosResponse(movimientos);

@@ -12,13 +12,13 @@ import com.victorlh.registrocontable.movimientosservice.infrastructure.entities.
 @Repository
 public interface MovimientosRepository extends JpaRepository<MovimientoEntity, Long> {
 
-	List<MovimientoEntity> findByUidAndFechaBetweenOrderByFechaAsc(String uid, Date fromDate, Date toDate);
+	List<MovimientoEntity> findByUidAndFechaBetweenOrderByFechaDesc(String uid, Date fromDate, Date toDate);
 	
-	List<MovimientoEntity> findByCuentaIdAndFechaBetweenOrderByFechaAsc(String cuentaId, Date fromDate, Date toDate);
+	List<MovimientoEntity> findByCuentaIdAndFechaBetweenOrderByFechaDesc(String cuentaId, Date fromDate, Date toDate);
 	
-	List<MovimientoEntity> findByUidAndTipoMovimientoIdAndFechaBetweenOrderByFechaAsc(String uid, String tipoMovimientoId, Date fromDate, Date toDate);
+	List<MovimientoEntity> findByUidAndTipoMovimientoIdAndFechaBetweenOrderByFechaDesc(String uid, String tipoMovimientoId, Date fromDate, Date toDate);
 	
-	List<MovimientoEntity> findByCuentaIdAndTipoMovimientoIdAndFechaBetweenOrderByFechaAsc(String cuentaId, String tipoMovimientoId, Date fromDate, Date toDate);
+	List<MovimientoEntity> findByCuentaIdAndTipoMovimientoIdAndFechaBetweenOrderByFechaDesc(String cuentaId, String tipoMovimientoId, Date fromDate, Date toDate);
 
 	Optional<MovimientoEntity> findFirstByCuentaIdAndFechaLessThanOrderByFechaDesc(String cuentaId, Date fecha);
 	

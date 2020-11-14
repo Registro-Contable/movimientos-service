@@ -40,7 +40,7 @@ public class MovimientosServiceImpl implements MovimientosService {
 		fromDate = fromDate != null ? fromDate : minDate();
 		toDate = toDate != null ? toDate : maxDate();
 
-		List<MovimientoEntity> movimientosEntities = movimientosRepository.findByUidAndFechaBetweenOrderByFechaAsc(uid, fromDate, toDate);
+		List<MovimientoEntity> movimientosEntities = movimientosRepository.findByUidAndFechaBetweenOrderByFechaDesc(uid, fromDate, toDate);
 
 		return movimientosEntityMapper.listMovimientosEntityToListMovimientos(movimientosEntities);
 	}
@@ -50,7 +50,7 @@ public class MovimientosServiceImpl implements MovimientosService {
 		fromDate = fromDate != null ? fromDate : minDate();
 		toDate = toDate != null ? toDate : maxDate();
 
-		List<MovimientoEntity> movimientosEntities = movimientosRepository.findByCuentaIdAndFechaBetweenOrderByFechaAsc(cuentaId, fromDate, toDate);
+		List<MovimientoEntity> movimientosEntities = movimientosRepository.findByCuentaIdAndFechaBetweenOrderByFechaDesc(cuentaId, fromDate, toDate);
 
 		return movimientosEntityMapper.listMovimientosEntityToListMovimientos(movimientosEntities);
 	}
@@ -60,7 +60,7 @@ public class MovimientosServiceImpl implements MovimientosService {
 		fromDate = fromDate != null ? fromDate : minDate();
 		toDate = toDate != null ? toDate : maxDate();
 
-		List<MovimientoEntity> movimientosEntities = movimientosRepository.findByUidAndTipoMovimientoIdAndFechaBetweenOrderByFechaAsc(uid,
+		List<MovimientoEntity> movimientosEntities = movimientosRepository.findByUidAndTipoMovimientoIdAndFechaBetweenOrderByFechaDesc(uid,
 				tipoMovimiento.name(), fromDate, toDate);
 
 		return movimientosEntityMapper.listMovimientosEntityToListMovimientos(movimientosEntities);
@@ -71,7 +71,7 @@ public class MovimientosServiceImpl implements MovimientosService {
 		fromDate = fromDate != null ? fromDate : minDate();
 		toDate = toDate != null ? toDate : maxDate();
 
-		List<MovimientoEntity> movimientosEntities = movimientosRepository.findByCuentaIdAndTipoMovimientoIdAndFechaBetweenOrderByFechaAsc(cuentaId,
+		List<MovimientoEntity> movimientosEntities = movimientosRepository.findByCuentaIdAndTipoMovimientoIdAndFechaBetweenOrderByFechaDesc(cuentaId,
 				tipoMovimiento.name(), fromDate, toDate);
 
 		return movimientosEntityMapper.listMovimientosEntityToListMovimientos(movimientosEntities);
