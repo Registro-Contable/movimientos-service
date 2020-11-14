@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -95,16 +96,29 @@ public class MovimientosController {
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "El movimiento indicado no existe"));
 
 		validarPropiedad(movimiento, uid);
-		
+
 		MovimientoBuilder builder = movimientosApiMapper.movimientoRequestToMovimientoBuilder(request);
-		
+
 		try {
 			movimiento = movimientoService.editarMovimiento(movimiento, builder);
 		} catch (FechaRepetidaException e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getLocalizedMessage());
 		}
-		
+
 		return movimientosApiMapper.movimientoToMovimientoResponse(movimiento);
+	}
+
+	@DeleteMapping("/{id}")
+	public void borrarMovimiento(@PathVariable Long id, Authentication auth) {
+		String uid = (String) auth.getPrincipal();
+
+		Optional<Movimiento> movimientoOpt = movimientoService.getMovimiento(id);
+		Movimiento movimiento = movimientoOpt
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "El movimiento indicado no existe"));
+
+		validarPropiedad(movimiento, uid);
+
+		movimientoService.borrarMovimiento(movimiento);
 	}
 
 	private void validarPropiedad(Movimiento movimiento, String uid) {
