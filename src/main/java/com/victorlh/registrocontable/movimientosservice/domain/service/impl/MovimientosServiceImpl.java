@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +25,8 @@ import com.victorlh.registrocontable.movimientosservice.mappers.MovimientosEntit
 
 @Service
 public class MovimientosServiceImpl implements MovimientosService {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(MovimientosServiceImpl.class);
 
 	@Autowired
 	private MovimientosRepository movimientosRepository;
@@ -45,7 +49,7 @@ public class MovimientosServiceImpl implements MovimientosService {
 	public List<Movimiento> getMovimientosCuenta(String cuentaId, Date fromDate, Date toDate) {
 		fromDate = fromDate != null ? fromDate : minDate();
 		toDate = toDate != null ? toDate : maxDate();
-		
+
 		List<MovimientoEntity> movimientosEntities = movimientosRepository.findByCuentaIdAndFechaBetweenOrderByFechaAsc(cuentaId, fromDate, toDate);
 
 		return movimientosEntityMapper.listMovimientosEntityToListMovimientos(movimientosEntities);
@@ -72,7 +76,7 @@ public class MovimientosServiceImpl implements MovimientosService {
 
 		return movimientosEntityMapper.listMovimientosEntityToListMovimientos(movimientosEntities);
 	}
-	
+
 	@Override
 	public Optional<Movimiento> getMovimiento(Long movimientoId) {
 		Optional<MovimientoEntity> movimiento = movimientosRepository.findById(movimientoId);
@@ -103,8 +107,13 @@ public class MovimientosServiceImpl implements MovimientosService {
 
 	@Override
 	public Movimiento editarMovimiento(Movimiento movimiento, MovimientoBuilder builder) {
+		LOGGER.trace("Cuenta igual: {}", StringUtils.equals(movimiento.getCuentaId(), builder.getCuentaId()));
+		LOGGER.trace("Medio pago igual: {}", StringUtils.equals(movimiento.getMedioPagoId(), builder.getMedioPagoId()));
+		LOGGER.trace("fecha igual: {}", movimiento.getFecha().getTime() == builder.getFecha().getTime());
+
 		if (!StringUtils.equals(movimiento.getCuentaId(), builder.getCuentaId())
-				|| !StringUtils.equals(movimiento.getMedioPagoId(), builder.getMedioPagoId()) || !movimiento.getFecha().equals(builder.getFecha())) {
+				|| !StringUtils.equals(movimiento.getMedioPagoId(), builder.getMedioPagoId())
+				|| movimiento.getFecha().getTime() != builder.getFecha().getTime()) {
 			borrarMovimiento(movimiento);
 			return nuevoMovimiento(movimiento.getUid(), builder);
 		}
@@ -152,18 +161,18 @@ public class MovimientosServiceImpl implements MovimientosService {
 		}
 		entity.setCapitalPrevio(capitalPrevio);
 		entity.setCapitalPosterior(capitalPrevio + entity.getCantidad());
-		
+
 		try {
 			return movimientosRepository.save(entity);
-		}catch (Exception e) {
+		} catch (Exception e) {
 			throw new FechaRepetidaException(e);
 		}
 	}
-	
+
 	private Date minDate() {
 		return new GregorianCalendar(1900, 0, 1).getTime();
 	}
-	
+
 	private Date maxDate() {
 		return new GregorianCalendar(2900, 11, 31).getTime();
 	}

@@ -12,6 +12,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -83,6 +84,27 @@ public class MovimientosController {
 		} catch (FechaRepetidaException e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getLocalizedMessage());
 		}
+	}
+
+	@PutMapping("/{id}")
+	public MovimientoResponseDTO detallesMovimiento(@PathVariable Long id, @RequestBody MovimientoRequestDTO request, Authentication auth) {
+		String uid = (String) auth.getPrincipal();
+
+		Optional<Movimiento> movimientoOpt = movimientoService.getMovimiento(id);
+		Movimiento movimiento = movimientoOpt
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "El movimiento indicado no existe"));
+
+		validarPropiedad(movimiento, uid);
+		
+		MovimientoBuilder builder = movimientosApiMapper.movimientoRequestToMovimientoBuilder(request);
+		
+		try {
+			movimiento = movimientoService.editarMovimiento(movimiento, builder);
+		} catch (FechaRepetidaException e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getLocalizedMessage());
+		}
+		
+		return movimientosApiMapper.movimientoToMovimientoResponse(movimiento);
 	}
 
 	private void validarPropiedad(Movimiento movimiento, String uid) {
