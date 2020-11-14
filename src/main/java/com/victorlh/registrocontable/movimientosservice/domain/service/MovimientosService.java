@@ -2,6 +2,7 @@ package com.victorlh.registrocontable.movimientosservice.domain.service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import com.victorlh.registrocontable.movimientosservice.domain.conf.ETipoMovimiento;
 import com.victorlh.registrocontable.movimientosservice.domain.model.Movimiento;
@@ -16,6 +17,8 @@ public interface MovimientosService {
 	public List<Movimiento> getMovimientosUsuario(String uid, Date fromDate, Date toDate, ETipoMovimiento tipoMovimiento);
 
 	public List<Movimiento> getMovimientosCuenta(String cuentaId, Date fromDate, Date toDate, ETipoMovimiento tipoMovimiento);
+	
+	public Optional<Movimiento> getMovimiento(Long movimientoId);
 
 	public Movimiento nuevoMovimiento(String uid, MovimientoBuilder builder);
 	

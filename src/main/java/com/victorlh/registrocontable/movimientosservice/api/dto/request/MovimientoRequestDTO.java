@@ -2,8 +2,11 @@ package com.victorlh.registrocontable.movimientosservice.api.dto.request;
 
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 public class MovimientoRequestDTO {
 
+	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
 	private Date fecha;
 	private String tipoMovimientoId;
 	private String categoriaId;

@@ -10,11 +10,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.victorlh.registrocontable.movimientosservice.domain.conf.ETipoMovimiento;
+import com.victorlh.registrocontable.movimientosservice.domain.exceptions.FechaRepetidaException;
 import com.victorlh.registrocontable.movimientosservice.domain.model.Movimiento;
 import com.victorlh.registrocontable.movimientosservice.domain.model.MovimientoBuilder;
 import com.victorlh.registrocontable.movimientosservice.domain.service.MovimientosService;
 import com.victorlh.registrocontable.movimientosservice.infrastructure.entities.MovimientoEntity;
-import com.victorlh.registrocontable.movimientosservice.infrastructure.feign.api.TiposCuentasFeign;
+import com.victorlh.registrocontable.movimientosservice.infrastructure.feign.api.CuentasFeign;
+import com.victorlh.registrocontable.movimientosservice.infrastructure.feign.dto.response.MedioPagoResponseDTO;
 import com.victorlh.registrocontable.movimientosservice.infrastructure.feign.dto.response.TipoMedioPagoResponseDTO;
 import com.victorlh.registrocontable.movimientosservice.infrastructure.repositories.MovimientosRepository;
 import com.victorlh.registrocontable.movimientosservice.mappers.MovimientosEntityMapper;
@@ -27,7 +29,7 @@ public class MovimientosServiceImpl implements MovimientosService {
 	@Autowired
 	private MovimientosEntityMapper movimientosEntityMapper;
 	@Autowired
-	private TiposCuentasFeign tipoCuentasFeign;
+	private CuentasFeign cuentasFeign;
 
 	@Override
 	public List<Movimiento> getMovimientosUsuario(String uid, Date fromDate, Date toDate) {
@@ -70,12 +72,19 @@ public class MovimientosServiceImpl implements MovimientosService {
 
 		return movimientosEntityMapper.listMovimientosEntityToListMovimientos(movimientosEntities);
 	}
+	
+	@Override
+	public Optional<Movimiento> getMovimiento(Long movimientoId) {
+		Optional<MovimientoEntity> movimiento = movimientosRepository.findById(movimientoId);
+		return movimiento.map(movimientosEntityMapper::movimientoEntityToMovimiento);
+	}
 
 	@Override
 	public Movimiento nuevoMovimiento(String uid, MovimientoBuilder builder) {
 		if (builder.isMovimientoContable() == null) {
-			TipoMedioPagoResponseDTO tipoMedioPagoDetalles = tipoCuentasFeign.tipoMedioPagoDetalles(builder.getMedioPagoId());
-			builder.setMovimientoContable(tipoMedioPagoDetalles.isMovimientoContable());
+			MedioPagoResponseDTO medioPagoDetalles = cuentasFeign.medioPagoDetalles(builder.getCuentaId(), builder.getMedioPagoId());
+			TipoMedioPagoResponseDTO tipoMedioPago = medioPagoDetalles.getTipoMedioPago();
+			builder.setMovimientoContable(tipoMedioPago.isMovimientoContable());
 		}
 
 		MovimientoEntity entity = movimientosEntityMapper.movimientoBuilderToMovimientoEntity(builder);
@@ -143,7 +152,12 @@ public class MovimientosServiceImpl implements MovimientosService {
 		}
 		entity.setCapitalPrevio(capitalPrevio);
 		entity.setCapitalPosterior(capitalPrevio + entity.getCantidad());
-		return movimientosRepository.save(entity);
+		
+		try {
+			return movimientosRepository.save(entity);
+		}catch (Exception e) {
+			throw new FechaRepetidaException(e);
+		}
 	}
 	
 	private Date minDate() {
