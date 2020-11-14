@@ -7,7 +7,6 @@ import java.util.Optional;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.format.annotation.DateTimeFormat.ISO;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -40,8 +39,8 @@ public class MovimientosController {
 	@GetMapping({ "/", "" })
 	public List<MovimientoResponseDTO> listaMovimientos(@RequestParam(name = "tipoMovimiento") String tipoMovimientoId,
 			@RequestParam(name = "cuentaId", required = false) String cuentaId,
-			@RequestParam(value = "fromDate", required = false) @DateTimeFormat(iso = ISO.DATE_TIME) Date fromDate,
-			@RequestParam(value = "toDate", required = false) @DateTimeFormat(iso = ISO.DATE_TIME) Date toDate, Authentication auth) {
+			@RequestParam(value = "fromDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date fromDate,
+			@RequestParam(value = "toDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date toDate, Authentication auth) {
 		String uid = (String) auth.getPrincipal();
 
 		Optional<ETipoMovimiento> tipoMovimientoOpt = ETipoMovimiento.findById(tipoMovimientoId);
