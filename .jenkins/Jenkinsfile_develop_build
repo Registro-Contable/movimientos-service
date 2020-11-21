@@ -68,7 +68,10 @@ pipeline {
         }
         stage('clean-docker') {
             steps {
-                sh " docker image prune -f"
+            	sh "docker rmi ${DOCKER_NAME}:${VERSION}"
+            	sh "docker rmi ${DOCKER_REPO}/${DOCKER_NAME}:${VERSION}"
+            	sh "docker rmi ${DOCKER_REPO}/${DOCKER_NAME}:latest"
+                sh "docker image prune -f"
             }
         }
     }
