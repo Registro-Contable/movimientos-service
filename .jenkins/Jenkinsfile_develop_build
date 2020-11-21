@@ -54,18 +54,14 @@ pipeline {
                 sh "docker build -t ${DOCKER_NAME}:${VERSION} ."
             }
         }
-        stage('run-docker') {
-            steps {
-                sh "echo TAG=${VERSION} > docker-compose.env"
-                sh "docker-compose --env-file docker-compose.env up -d"
-            }
-        }
         stage('push-docker') {
             steps {
                 withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: "${CREDENTIALS_NEXUS}", usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
                     sh "docker login -u ${USERNAME} -p ${PASSWORD} ${DOCKER_REPO}"
                     sh "docker tag ${DOCKER_NAME}:${VERSION} ${DOCKER_REPO}/${DOCKER_NAME}:${VERSION}"
+                    sh "docker tag ${DOCKER_NAME}:${VERSION} ${DOCKER_REPO}/${DOCKER_NAME}:latest"
                     sh "docker push ${DOCKER_REPO}/${DOCKER_NAME}:${VERSION}"
+                    sh "docker push ${DOCKER_REPO}/${DOCKER_NAME}:latest"
                 }
                 
             }
