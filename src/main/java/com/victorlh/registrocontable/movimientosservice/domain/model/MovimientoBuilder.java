@@ -10,6 +10,7 @@ public class MovimientoBuilder {
 	private Date fecha;
 	private ETipoMovimiento tipoMovimiento;
 	private String categoriaId;
+	private String subCategoriaId;
 	private String cuentaId;
 	private String medioPagoId;
 	private double cantidad;
@@ -97,6 +98,14 @@ public class MovimientoBuilder {
 
 	public void setMovimientoContable(Boolean isMovimientoContable) {
 		this.isMovimientoContable = isMovimientoContable;
+	}
+
+	public String getSubCategoriaId() {
+		return subCategoriaId;
+	}
+
+	public void setSubCategoriaId(String subCategoriaId) {
+		this.subCategoriaId = subCategoriaId;
 	}
 
 }

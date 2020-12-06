@@ -53,4 +53,15 @@
 		</rollback>
 	</changeSet>
 
+	<changeSet author="victorlh"
+		id="movimientos-service-20201206-001">
+		<addColumn tableName="movimientos" schemaName="movimientos">
+			<column name="suv_categoria_id" type="VARCHAR(255)" />
+		</addColumn>
+		<rollback>
+			<dropColumn tableName="movimientos"
+				schemaName="movimientos" columnName="suv_categoria_id" />
+		</rollback>
+	</changeSet>
+
 </databaseChangeLog>

@@ -11,9 +11,8 @@ public class Movimiento {
 	private String uid;
 	private Date fecha;
 	private ETipoMovimiento tipoMovimiento;
-	private String categoriaId;
-	private String cuentaId;
-	private String medioPagoId;
+	private Categoria categoria;
+	private Cuenta cuenta;
 	private double cantidad;
 	private String concepto;
 	private String nota;
@@ -55,30 +54,6 @@ public class Movimiento {
 
 	public void setTipoMovimiento(ETipoMovimiento tipoMovimiento) {
 		this.tipoMovimiento = tipoMovimiento;
-	}
-
-	public String getCategoriaId() {
-		return categoriaId;
-	}
-
-	public void setCategoriaId(String categoriaId) {
-		this.categoriaId = categoriaId;
-	}
-
-	public String getCuentaId() {
-		return cuentaId;
-	}
-
-	public void setCuentaId(String cuentaId) {
-		this.cuentaId = cuentaId;
-	}
-
-	public String getMedioPagoId() {
-		return medioPagoId;
-	}
-
-	public void setMedioPagoId(String medioPagoId) {
-		this.medioPagoId = medioPagoId;
 	}
 
 	public double getCantidad() {
@@ -135,6 +110,22 @@ public class Movimiento {
 
 	public void setMovimietosAsociados(List<Movimiento> movimietosAsociados) {
 		this.movimietosAsociados = movimietosAsociados;
+	}
+
+	public Categoria getCategoria() {
+		return categoria;
+	}
+
+	public void setCategoria(Categoria categoria) {
+		this.categoria = categoria;
+	}
+
+	public Cuenta getCuenta() {
+		return cuenta;
+	}
+
+	public void setCuenta(Cuenta cuenta) {
+		this.cuenta = cuenta;
 	}
 
 }

@@ -6,10 +6,11 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 public class MovimientoRequestDTO {
 
-	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date fecha;
 	private String tipoMovimientoId;
 	private String categoriaId;
+	private String subCategoriaId;
 	private String cuentaId;
 	private String medioPagoId;
 	private double cantidad;
@@ -78,6 +79,14 @@ public class MovimientoRequestDTO {
 
 	public void setNota(String nota) {
 		this.nota = nota;
+	}
+
+	public String getSubCategoriaId() {
+		return subCategoriaId;
+	}
+
+	public void setSubCategoriaId(String subCategoriaId) {
+		this.subCategoriaId = subCategoriaId;
 	}
 
 }

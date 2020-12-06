@@ -8,12 +8,11 @@ public class MovimientoResponseDTO {
 
 	private Long id;
 	private String uid;
-	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date fecha;
 	private String tipoMovimientoId;
-	private String categoriaId;
-	private String cuentaId;
-	private String medioPagoId;
+	private CategoriaResponseDTO categoria;
+	private CuentaResponseDTO cuenta;
 	private double cantidad;
 	private String concepto;
 	private String nota;
@@ -55,28 +54,20 @@ public class MovimientoResponseDTO {
 		this.tipoMovimientoId = tipoMovimientoId;
 	}
 
-	public String getCategoriaId() {
-		return categoriaId;
+	public CategoriaResponseDTO getCategoria() {
+		return categoria;
 	}
 
-	public void setCategoriaId(String categoriaId) {
-		this.categoriaId = categoriaId;
+	public void setCategoria(CategoriaResponseDTO categoria) {
+		this.categoria = categoria;
 	}
 
-	public String getCuentaId() {
-		return cuentaId;
+	public CuentaResponseDTO getCuenta() {
+		return cuenta;
 	}
 
-	public void setCuentaId(String cuentaId) {
-		this.cuentaId = cuentaId;
-	}
-
-	public String getMedioPagoId() {
-		return medioPagoId;
-	}
-
-	public void setMedioPagoId(String medioPagoId) {
-		this.medioPagoId = medioPagoId;
+	public void setCuenta(CuentaResponseDTO cuenta) {
+		this.cuenta = cuenta;
 	}
 
 	public double getCantidad() {

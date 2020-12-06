@@ -22,7 +22,7 @@ public class MovimientoEntity {
 
 	@Column(name = "tipo_movimiento_id", length = 30, nullable = false)
 	private String tipoMovimientoId;
-	
+
 	@Column(name = "uid", nullable = false)
 	private String uid;
 
@@ -37,6 +37,9 @@ public class MovimientoEntity {
 
 	@Column(name = "categoria_id")
 	private String categoriaId;
+
+	@Column(name = "suv_categoria_id")
+	private String subCategoriaId;
 
 	@Column
 	private String concepto;
@@ -60,11 +63,11 @@ public class MovimientoEntity {
 	public void setId(Long id) {
 		this.id = id;
 	}
-	
+
 	public String getUid() {
 		return uid;
 	}
-	
+
 	public void setUid(String uid) {
 		this.uid = uid;
 	}
@@ -155,6 +158,14 @@ public class MovimientoEntity {
 
 	public void setCapitalPosterior(Double capitalPosterior) {
 		this.capitalPosterior = capitalPosterior;
+	}
+
+	public String getSubCategoriaId() {
+		return subCategoriaId;
+	}
+
+	public void setSubCategoriaId(String subCategoriaId) {
+		this.subCategoriaId = subCategoriaId;
 	}
 
 }

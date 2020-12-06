@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -13,12 +14,18 @@ import org.springframework.stereotype.Service;
 
 import com.victorlh.registrocontable.movimientosservice.domain.conf.ETipoMovimiento;
 import com.victorlh.registrocontable.movimientosservice.domain.exceptions.FechaRepetidaException;
+import com.victorlh.registrocontable.movimientosservice.domain.model.Categoria;
+import com.victorlh.registrocontable.movimientosservice.domain.model.Cuenta;
 import com.victorlh.registrocontable.movimientosservice.domain.model.Movimiento;
 import com.victorlh.registrocontable.movimientosservice.domain.model.MovimientoBuilder;
 import com.victorlh.registrocontable.movimientosservice.domain.service.MovimientosService;
 import com.victorlh.registrocontable.movimientosservice.infrastructure.entities.MovimientoEntity;
+import com.victorlh.registrocontable.movimientosservice.infrastructure.feign.api.CategoriasFeign;
 import com.victorlh.registrocontable.movimientosservice.infrastructure.feign.api.CuentasFeign;
+import com.victorlh.registrocontable.movimientosservice.infrastructure.feign.dto.response.CategoriaResponse;
+import com.victorlh.registrocontable.movimientosservice.infrastructure.feign.dto.response.CuentaResponseDTO;
 import com.victorlh.registrocontable.movimientosservice.infrastructure.feign.dto.response.MedioPagoResponseDTO;
+import com.victorlh.registrocontable.movimientosservice.infrastructure.feign.dto.response.SubCategoriaResponse;
 import com.victorlh.registrocontable.movimientosservice.infrastructure.feign.dto.response.TipoMedioPagoResponseDTO;
 import com.victorlh.registrocontable.movimientosservice.infrastructure.repositories.MovimientosRepository;
 import com.victorlh.registrocontable.movimientosservice.mappers.MovimientosEntityMapper;
@@ -34,6 +41,8 @@ public class MovimientosServiceImpl implements MovimientosService {
 	private MovimientosEntityMapper movimientosEntityMapper;
 	@Autowired
 	private CuentasFeign cuentasFeign;
+	@Autowired
+	private CategoriasFeign categoriasFeign;
 
 	@Override
 	public List<Movimiento> getMovimientosUsuario(String uid, Date fromDate, Date toDate) {
@@ -41,8 +50,7 @@ public class MovimientosServiceImpl implements MovimientosService {
 		toDate = toDate != null ? toDate : maxDate();
 
 		List<MovimientoEntity> movimientosEntities = movimientosRepository.findByUidAndFechaBetweenOrderByFechaDesc(uid, fromDate, toDate);
-
-		return movimientosEntityMapper.listMovimientosEntityToListMovimientos(movimientosEntities);
+		return movimientosEntities.stream().map(this::getFullDataMovimientos).collect(Collectors.toList());
 	}
 
 	@Override
@@ -51,8 +59,7 @@ public class MovimientosServiceImpl implements MovimientosService {
 		toDate = toDate != null ? toDate : maxDate();
 
 		List<MovimientoEntity> movimientosEntities = movimientosRepository.findByCuentaIdAndFechaBetweenOrderByFechaDesc(cuentaId, fromDate, toDate);
-
-		return movimientosEntityMapper.listMovimientosEntityToListMovimientos(movimientosEntities);
+		return movimientosEntities.stream().map(this::getFullDataMovimientos).collect(Collectors.toList());
 	}
 
 	@Override
@@ -62,8 +69,7 @@ public class MovimientosServiceImpl implements MovimientosService {
 
 		List<MovimientoEntity> movimientosEntities = movimientosRepository.findByUidAndTipoMovimientoIdAndFechaBetweenOrderByFechaDesc(uid,
 				tipoMovimiento.name(), fromDate, toDate);
-
-		return movimientosEntityMapper.listMovimientosEntityToListMovimientos(movimientosEntities);
+		return movimientosEntities.stream().map(this::getFullDataMovimientos).collect(Collectors.toList());
 	}
 
 	@Override
@@ -73,14 +79,13 @@ public class MovimientosServiceImpl implements MovimientosService {
 
 		List<MovimientoEntity> movimientosEntities = movimientosRepository.findByCuentaIdAndTipoMovimientoIdAndFechaBetweenOrderByFechaDesc(cuentaId,
 				tipoMovimiento.name(), fromDate, toDate);
-
-		return movimientosEntityMapper.listMovimientosEntityToListMovimientos(movimientosEntities);
+		return movimientosEntities.stream().map(this::getFullDataMovimientos).collect(Collectors.toList());
 	}
 
 	@Override
 	public Optional<Movimiento> getMovimiento(Long movimientoId) {
 		Optional<MovimientoEntity> movimiento = movimientosRepository.findById(movimientoId);
-		return movimiento.map(movimientosEntityMapper::movimientoEntityToMovimiento);
+		return movimiento.map(this::getFullDataMovimientos);
 	}
 
 	@Override
@@ -102,17 +107,17 @@ public class MovimientosServiceImpl implements MovimientosService {
 			updateCapitalAndSave(e);
 		});
 
-		return movimientosEntityMapper.movimientoEntityToMovimiento(entity);
+		return getFullDataMovimientos(entity);
 	}
 
 	@Override
 	public Movimiento editarMovimiento(Movimiento movimiento, MovimientoBuilder builder) {
-		LOGGER.trace("Cuenta igual: {}", StringUtils.equals(movimiento.getCuentaId(), builder.getCuentaId()));
-		LOGGER.trace("Medio pago igual: {}", StringUtils.equals(movimiento.getMedioPagoId(), builder.getMedioPagoId()));
+		LOGGER.trace("Cuenta igual: {}", StringUtils.equals(movimiento.getCuenta().getCuentaId(), builder.getCuentaId()));
+		LOGGER.trace("Medio pago igual: {}", StringUtils.equals(movimiento.getCuenta().getMedioPago().getMedioPagoId(), builder.getMedioPagoId()));
 		LOGGER.trace("fecha igual: {}", movimiento.getFecha().getTime() == builder.getFecha().getTime());
 
-		if (!StringUtils.equals(movimiento.getCuentaId(), builder.getCuentaId())
-				|| !StringUtils.equals(movimiento.getMedioPagoId(), builder.getMedioPagoId())
+		if (!StringUtils.equals(movimiento.getCuenta().getCuentaId(), builder.getCuentaId())
+				|| !StringUtils.equals(movimiento.getCuenta().getMedioPago().getMedioPagoId(), builder.getMedioPagoId())
 				|| movimiento.getFecha().getTime() != builder.getFecha().getTime()) {
 			borrarMovimiento(movimiento);
 			return nuevoMovimiento(movimiento.getUid(), builder);
@@ -137,15 +142,15 @@ public class MovimientosServiceImpl implements MovimientosService {
 			});
 		}
 
-		return movimientosEntityMapper.movimientoEntityToMovimiento(entity);
+		return getFullDataMovimientos(entity);
 	}
 
 	@Override
 	public void borrarMovimiento(Movimiento movimiento) {
 		movimientosRepository.deleteById(movimiento.getId());
 
-		List<MovimientoEntity> posterioresEntities = movimientosRepository.findByCuentaIdAndFechaGreaterThanOrderByFechaAsc(movimiento.getCuentaId(),
-				movimiento.getFecha());
+		List<MovimientoEntity> posterioresEntities = movimientosRepository
+				.findByCuentaIdAndFechaGreaterThanOrderByFechaAsc(movimiento.getCuenta().getCuentaId(), movimiento.getFecha());
 		posterioresEntities.forEach(e -> {
 			updateCapitalAndSave(e);
 		});
@@ -175,6 +180,29 @@ public class MovimientosServiceImpl implements MovimientosService {
 
 	private Date maxDate() {
 		return new GregorianCalendar(2900, 11, 31).getTime();
+	}
+
+	private Movimiento getFullDataMovimientos(MovimientoEntity entity) {
+		String cuentaId = entity.getCuentaId();
+		CuentaResponseDTO detallesCuenta = cuentasFeign.detalles(cuentaId);
+		Optional<MedioPagoResponseDTO> medioPagoOpt = detallesCuenta.mediosPago.stream()
+				.filter(mp -> StringUtils.equals(entity.getMedioPagoId(), mp.getId()))
+				.findFirst();
+		MedioPagoResponseDTO medioPago = medioPagoOpt.orElse(null);
+
+		Cuenta cuenta = movimientosEntityMapper.cuentaResponseDtoToCuenta(detallesCuenta, medioPago);
+
+		String categoriaId = entity.getCategoriaId();
+		CategoriaResponse detallesCategoria = categoriasFeign.detalles(categoriaId);
+		Optional<SubCategoriaResponse> subCategoriaOpt = detallesCategoria.getSubCategorias()
+				.stream()
+				.filter(sc -> StringUtils.equals(entity.getSubCategoriaId(), sc.getId()))
+				.findFirst();
+		SubCategoriaResponse subCategoria = subCategoriaOpt.orElse(null);
+
+		Categoria categoria = movimientosEntityMapper.categoriaResponseDtoToCategoria(detallesCategoria, subCategoria);
+
+		return movimientosEntityMapper.movimientoEntityToMovimiento(entity, cuenta, categoria);
 	}
 
 }
