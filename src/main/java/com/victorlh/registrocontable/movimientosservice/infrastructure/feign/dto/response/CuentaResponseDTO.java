@@ -1,17 +1,18 @@
 package com.victorlh.registrocontable.movimientosservice.infrastructure.feign.dto.response;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 public class CuentaResponseDTO {
 
-	public String id;
-	public String uid;
-	public TipoCuentaResponseDTO tipoCuenta;
-	public String nombre;
-	public double capital;
-	public Date fechaAlta;
-	public List<MedioPagoResponseDTO> mediosPago;
+	private String id;
+	private String uid;
+	private TipoCuentaResponseDTO tipoCuenta;
+	private String nombre;
+	private double capital;
+	private Date fechaAlta;
+	private List<MedioPagoResponseDTO> mediosPago;
 
 	public String getId() {
 		return id;
@@ -59,6 +60,17 @@ public class CuentaResponseDTO {
 
 	public void setFechaAlta(Date fechaAlta) {
 		this.fechaAlta = fechaAlta;
+	}
+
+	public List<MedioPagoResponseDTO> getMediosPago() {
+		if (mediosPago == null) {
+			mediosPago = new ArrayList<>();
+		}
+		return mediosPago;
+	}
+
+	public void setMediosPago(List<MedioPagoResponseDTO> mediosPago) {
+		this.mediosPago = mediosPago;
 	}
 
 }

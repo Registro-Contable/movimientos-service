@@ -1,14 +1,15 @@
 package com.victorlh.registrocontable.movimientosservice.infrastructure.feign.dto.response;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class CategoriaResponse {
 
-	public String id;
-	public String uid;
-	public String tipoMovimiento;
-	public String nombre;
-	public List<SubCategoriaResponse> subCategorias;
+	private String id;
+	private String uid;
+	private String tipoMovimiento;
+	private String nombre;
+	private List<SubCategoriaResponse> subCategorias;
 
 	public CategoriaResponse() {
 	}
@@ -46,6 +47,9 @@ public class CategoriaResponse {
 	}
 
 	public List<SubCategoriaResponse> getSubCategorias() {
+		if (subCategorias == null) {
+			subCategorias = new ArrayList<>();
+		}
 		return subCategorias;
 	}
 

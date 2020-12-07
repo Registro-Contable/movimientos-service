@@ -10,6 +10,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.victorlh.registrocontable.movimientosservice.domain.conf.ETipoMovimiento;
@@ -30,6 +31,8 @@ import com.victorlh.registrocontable.movimientosservice.infrastructure.feign.dto
 import com.victorlh.registrocontable.movimientosservice.infrastructure.feign.dto.response.TipoMedioPagoResponseDTO;
 import com.victorlh.registrocontable.movimientosservice.infrastructure.repositories.MovimientosRepository;
 import com.victorlh.registrocontable.movimientosservice.mappers.MovimientosEntityMapper;
+
+import feign.FeignException;
 
 @Service
 public class MovimientosServiceImpl implements MovimientosService {
@@ -199,16 +202,39 @@ public class MovimientosServiceImpl implements MovimientosService {
 
 	private Movimiento getFullDataMovimientos(MovimientoEntity entity) {
 		String cuentaId = entity.getCuentaId();
-		CuentaResponseDTO detallesCuenta = cuentasFeign.detalles(cuentaId);
-		Optional<MedioPagoResponseDTO> medioPagoOpt = detallesCuenta.mediosPago.stream()
+		CuentaResponseDTO detallesCuenta = null;
+		try {
+			detallesCuenta = cuentasFeign.detalles(cuentaId);
+		} catch (FeignException e) {
+			int status = e.status();
+			if (status != HttpStatus.NOT_FOUND.value()) {
+				LOGGER.error(e.getLocalizedMessage(), e);
+			}
+			detallesCuenta = new CuentaResponseDTO();
+			detallesCuenta.setId(cuentaId);
+		}
+
+		Optional<MedioPagoResponseDTO> medioPagoOpt = detallesCuenta.getMediosPago()
+				.stream()
 				.filter(mp -> StringUtils.equals(entity.getMedioPagoId(), mp.getId()))
 				.findFirst();
 		MedioPagoResponseDTO medioPago = medioPagoOpt.orElse(null);
-
 		Cuenta cuenta = movimientosEntityMapper.cuentaResponseDtoToCuenta(detallesCuenta, medioPago);
 
 		String categoriaId = entity.getCategoriaId();
-		CategoriaResponse detallesCategoria = categoriasFeign.detalles(categoriaId);
+		CategoriaResponse detallesCategoria = null;
+
+		try {
+			detallesCategoria = categoriasFeign.detalles(categoriaId);
+		} catch (FeignException e) {
+			int status = e.status();
+			if (status != HttpStatus.NOT_FOUND.value()) {
+				LOGGER.error(e.getLocalizedMessage(), e);
+			}
+			detallesCategoria = new CategoriaResponse();
+			detallesCategoria.setId(cuentaId);
+		}
+		
 		Optional<SubCategoriaResponse> subCategoriaOpt = detallesCategoria.getSubCategorias()
 				.stream()
 				.filter(sc -> StringUtils.equals(entity.getSubCategoriaId(), sc.getId()))
