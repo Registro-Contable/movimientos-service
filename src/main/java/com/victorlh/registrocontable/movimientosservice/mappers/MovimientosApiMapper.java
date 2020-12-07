@@ -7,10 +7,8 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 
 import com.victorlh.registrocontable.movimientosservice.api.dto.request.MovimientoRequestDTO;
-import com.victorlh.registrocontable.movimientosservice.api.dto.response.CapitalCuentaResponseDTO;
 import com.victorlh.registrocontable.movimientosservice.api.dto.response.MovimientoResponseDTO;
 import com.victorlh.registrocontable.movimientosservice.domain.conf.ETipoMovimiento;
-import com.victorlh.registrocontable.movimientosservice.domain.model.CapitalCuenta;
 import com.victorlh.registrocontable.movimientosservice.domain.model.Movimiento;
 import com.victorlh.registrocontable.movimientosservice.domain.model.MovimientoBuilder;
 
@@ -26,8 +24,6 @@ public interface MovimientosApiMapper {
 	@Mapping(target = "movimietosAsociados", ignore = true)
 	@Mapping(target = "tipoMovimiento", source = "request.tipoMovimientoId", qualifiedByName = "idToTipoMovimiento")
 	MovimientoBuilder movimientoRequestToMovimientoBuilder(MovimientoRequestDTO request);
-	
-	CapitalCuentaResponseDTO capitalCuentaToCapitalCuentaResponse(CapitalCuenta capitalCuenta);
 	
 	@Named("idToTipoMovimiento")
 	default ETipoMovimiento idToTipoMovimiento(String tipoMovimientoId) {

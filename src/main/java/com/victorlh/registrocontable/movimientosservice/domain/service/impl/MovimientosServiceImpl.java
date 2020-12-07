@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 
 import com.victorlh.registrocontable.movimientosservice.domain.conf.ETipoMovimiento;
 import com.victorlh.registrocontable.movimientosservice.domain.exceptions.FechaRepetidaException;
-import com.victorlh.registrocontable.movimientosservice.domain.model.CapitalCuenta;
 import com.victorlh.registrocontable.movimientosservice.domain.model.Categoria;
 import com.victorlh.registrocontable.movimientosservice.domain.model.Cuenta;
 import com.victorlh.registrocontable.movimientosservice.domain.model.Movimiento;
@@ -90,20 +89,6 @@ public class MovimientosServiceImpl implements MovimientosService {
 	public Optional<Movimiento> getMovimiento(Long movimientoId) {
 		Optional<MovimientoEntity> movimiento = movimientosRepository.findById(movimientoId);
 		return movimiento.map(this::getFullDataMovimientos);
-	}
-
-	@Override
-	public CapitalCuenta getCapitalCuenta(String cuentaId) {
-		CuentaResponseDTO cuentaResponseDTO = cuentasFeign.detalles(cuentaId);
-		Cuenta cuenta = movimientosEntityMapper.cuentaResponseDtoToCuenta(cuentaResponseDTO, null);
-
-		List<Movimiento> movimientos = this.getMovimientosCuenta(cuentaId, null, null);
-		Optional<Movimiento> findFirst = movimientos.stream().findFirst();
-
-		CapitalCuenta capitalCuenta = new CapitalCuenta();
-		capitalCuenta.setCuenta(cuenta);
-		findFirst.ifPresent(m -> capitalCuenta.setCapital(m.getCapitalPosterior()));
-		return capitalCuenta;
 	}
 
 	@Override
@@ -234,7 +219,7 @@ public class MovimientosServiceImpl implements MovimientosService {
 			detallesCategoria = new CategoriaResponse();
 			detallesCategoria.setId(cuentaId);
 		}
-		
+
 		Optional<SubCategoriaResponse> subCategoriaOpt = detallesCategoria.getSubCategorias()
 				.stream()
 				.filter(sc -> StringUtils.equals(entity.getSubCategoriaId(), sc.getId()))

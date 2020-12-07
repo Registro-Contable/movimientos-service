@@ -21,11 +21,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.victorlh.registrocontable.movimientosservice.api.dto.request.MovimientoRequestDTO;
-import com.victorlh.registrocontable.movimientosservice.api.dto.response.CapitalCuentaResponseDTO;
 import com.victorlh.registrocontable.movimientosservice.api.dto.response.MovimientoResponseDTO;
 import com.victorlh.registrocontable.movimientosservice.domain.conf.ETipoMovimiento;
 import com.victorlh.registrocontable.movimientosservice.domain.exceptions.FechaRepetidaException;
-import com.victorlh.registrocontable.movimientosservice.domain.model.CapitalCuenta;
 import com.victorlh.registrocontable.movimientosservice.domain.model.Movimiento;
 import com.victorlh.registrocontable.movimientosservice.domain.model.MovimientoBuilder;
 import com.victorlh.registrocontable.movimientosservice.domain.service.MovimientosService;
@@ -67,18 +65,6 @@ public class MovimientosController {
 		}
 
 		return movimientosApiMapper.listaMovimientosToListaMovimientosResponse(movimientos);
-	}
-
-	@GetMapping("/cuentas/{cuentaId}/capital")
-	public CapitalCuentaResponseDTO listaMovimientos(@PathVariable String cuentaId, Authentication auth) {
-		String uid = (String) auth.getPrincipal();
-		CapitalCuenta capitalCuenta = movimientoService.getCapitalCuenta(cuentaId);
-
-		if (!StringUtils.equals(capitalCuenta.getCuenta().getUid(), uid)) {
-			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permisos para acceder a este recurso");
-		}
-
-		return movimientosApiMapper.capitalCuentaToCapitalCuentaResponse(capitalCuenta);
 	}
 
 	@GetMapping("/{id}")
