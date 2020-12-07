@@ -30,6 +30,7 @@ public interface MovimientosEntityMapper {
 	Movimiento movimientoEntityToMovimiento(MovimientoEntity entity, Cuenta cuenta, Categoria categoria);
 
 	@Mapping(target = "cuentaId", source = "dto.id")
+	@Mapping(target = "uid", source = "dto.uid")
 	@Mapping(target = "nombre", source = "dto.nombre")
 	@Mapping(target = "medioPago", source = "medioPagoDto")
 	Cuenta cuentaResponseDtoToCuenta(CuentaResponseDTO dto, MedioPagoResponseDTO medioPagoDto);

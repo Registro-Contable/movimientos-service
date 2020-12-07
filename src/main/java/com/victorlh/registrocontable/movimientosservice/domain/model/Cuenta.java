@@ -3,6 +3,7 @@ package com.victorlh.registrocontable.movimientosservice.domain.model;
 public class Cuenta {
 
 	private String cuentaId;
+	private String uid;
 	private String nombre;
 	private MedioPago medioPago;
 
@@ -29,4 +30,13 @@ public class Cuenta {
 	public void setMedioPago(MedioPago medioPago) {
 		this.medioPago = medioPago;
 	}
+
+	public String getUid() {
+		return uid;
+	}
+
+	public void setUid(String uid) {
+		this.uid = uid;
+	}
+
 }
