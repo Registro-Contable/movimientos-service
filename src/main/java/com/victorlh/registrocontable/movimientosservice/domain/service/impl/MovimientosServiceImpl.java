@@ -144,6 +144,8 @@ public class MovimientosServiceImpl implements MovimientosService {
 			posterioresEntities.forEach(e -> {
 				updateCapitalAndSave(e);
 			});
+		} else {
+			entity = movimientosRepository.save(entity);
 		}
 
 		return getFullDataMovimientos(entity);
