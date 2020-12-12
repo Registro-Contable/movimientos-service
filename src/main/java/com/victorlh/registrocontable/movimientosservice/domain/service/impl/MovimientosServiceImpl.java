@@ -131,6 +131,7 @@ public class MovimientosServiceImpl implements MovimientosService {
 		MovimientoEntity entity = entityOpt.get();
 
 		entity.setCategoriaId(builder.getCategoriaId());
+		entity.setSubCategoriaId(builder.getSubCategoriaId());
 		entity.setConcepto(builder.getConcepto());
 		entity.setNota(builder.getNota());
 
