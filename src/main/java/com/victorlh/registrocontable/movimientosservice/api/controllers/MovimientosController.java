@@ -96,7 +96,7 @@ public class MovimientosController {
 	}
 
 	@PutMapping("/{id}")
-	public MovimientoResponseDTO detallesMovimiento(@PathVariable Long id, @RequestBody MovimientoRequestDTO request, Authentication auth) {
+	public MovimientoResponseDTO modificarMovimiento(@PathVariable Long id, @RequestBody MovimientoRequestDTO request, Authentication auth) {
 		String uid = (String) auth.getPrincipal();
 
 		Optional<Movimiento> movimientoOpt = movimientoService.getMovimiento(id);

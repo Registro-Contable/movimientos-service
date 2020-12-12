@@ -117,11 +117,12 @@ public class MovimientosServiceImpl implements MovimientosService {
 	public Movimiento editarMovimiento(Movimiento movimiento, MovimientoBuilder builder) {
 		LOGGER.trace("Cuenta igual: {}", StringUtils.equals(movimiento.getCuenta().getCuentaId(), builder.getCuentaId()));
 		LOGGER.trace("Medio pago igual: {}", StringUtils.equals(movimiento.getCuenta().getMedioPago().getMedioPagoId(), builder.getMedioPagoId()));
-		LOGGER.trace("fecha igual: {}", movimiento.getFecha().getTime() == builder.getFecha().getTime());
+		LOGGER.trace("Fecha igual: {}", movimiento.getFecha().getTime() == builder.getFecha().getTime());
+		LOGGER.trace("Tipo igual: {}", movimiento.getTipoMovimiento() == builder.getTipoMovimiento());
 
 		if (!StringUtils.equals(movimiento.getCuenta().getCuentaId(), builder.getCuentaId())
 				|| !StringUtils.equals(movimiento.getCuenta().getMedioPago().getMedioPagoId(), builder.getMedioPagoId())
-				|| movimiento.getFecha().getTime() != builder.getFecha().getTime()) {
+				|| movimiento.getFecha().getTime() != builder.getFecha().getTime() || movimiento.getTipoMovimiento() != builder.getTipoMovimiento()) {
 			borrarMovimiento(movimiento);
 			return nuevoMovimiento(movimiento.getUid(), builder);
 		}
