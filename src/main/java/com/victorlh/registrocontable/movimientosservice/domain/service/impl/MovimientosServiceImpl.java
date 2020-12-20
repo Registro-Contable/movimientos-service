@@ -1,18 +1,5 @@
 package com.victorlh.registrocontable.movimientosservice.domain.service.impl;
 
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
-
 import com.victorlh.registrocontable.movimientosservice.domain.conf.ETipoMovimiento;
 import com.victorlh.registrocontable.movimientosservice.domain.exceptions.FechaRepetidaException;
 import com.victorlh.registrocontable.movimientosservice.domain.model.Categoria;
@@ -30,8 +17,19 @@ import com.victorlh.registrocontable.movimientosservice.infrastructure.feign.dto
 import com.victorlh.registrocontable.movimientosservice.infrastructure.feign.dto.response.TipoMedioPagoResponseDTO;
 import com.victorlh.registrocontable.movimientosservice.infrastructure.repositories.MovimientosRepository;
 import com.victorlh.registrocontable.movimientosservice.mappers.MovimientosEntityMapper;
-
 import feign.FeignException;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class MovimientosServiceImpl implements MovimientosService {

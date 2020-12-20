@@ -1,9 +1,5 @@
 package com.victorlh.registrocontable.movimientosservice.mappers;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.Named;
-
 import com.victorlh.registrocontable.movimientosservice.domain.conf.ETipoMovimiento;
 import com.victorlh.registrocontable.movimientosservice.domain.model.Categoria;
 import com.victorlh.registrocontable.movimientosservice.domain.model.Cuenta;
@@ -16,6 +12,9 @@ import com.victorlh.registrocontable.movimientosservice.infrastructure.feign.dto
 import com.victorlh.registrocontable.movimientosservice.infrastructure.feign.dto.response.CuentaResponseDTO;
 import com.victorlh.registrocontable.movimientosservice.infrastructure.feign.dto.response.MedioPagoResponseDTO;
 import com.victorlh.registrocontable.movimientosservice.infrastructure.feign.dto.response.SubCategoriaResponse;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 
 @Mapper(componentModel = "spring")
 public interface MovimientosEntityMapper {

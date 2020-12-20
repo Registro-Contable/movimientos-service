@@ -1,9 +1,9 @@
 package com.victorlh.registrocontable.movimientosservice.domain.model;
 
+import com.victorlh.registrocontable.movimientosservice.domain.conf.ETipoMovimiento;
+
 import java.util.Date;
 import java.util.List;
-
-import com.victorlh.registrocontable.movimientosservice.domain.conf.ETipoMovimiento;
 
 public class Movimiento {
 

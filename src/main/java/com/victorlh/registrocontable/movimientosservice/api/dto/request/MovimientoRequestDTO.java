@@ -1,8 +1,8 @@
 package com.victorlh.registrocontable.movimientosservice.api.dto.request;
 
-import java.util.Date;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
+
+import java.util.Date;
 
 public class MovimientoRequestDTO {
 

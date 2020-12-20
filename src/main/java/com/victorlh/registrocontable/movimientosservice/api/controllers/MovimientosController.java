@@ -1,9 +1,13 @@
 package com.victorlh.registrocontable.movimientosservice.api.controllers;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-
+import com.victorlh.registrocontable.movimientosservice.api.dto.request.MovimientoRequestDTO;
+import com.victorlh.registrocontable.movimientosservice.api.dto.response.MovimientoResponseDTO;
+import com.victorlh.registrocontable.movimientosservice.domain.conf.ETipoMovimiento;
+import com.victorlh.registrocontable.movimientosservice.domain.exceptions.FechaRepetidaException;
+import com.victorlh.registrocontable.movimientosservice.domain.model.Movimiento;
+import com.victorlh.registrocontable.movimientosservice.domain.model.MovimientoBuilder;
+import com.victorlh.registrocontable.movimientosservice.domain.service.MovimientosService;
+import com.victorlh.registrocontable.movimientosservice.mappers.MovimientosApiMapper;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -20,14 +24,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.victorlh.registrocontable.movimientosservice.api.dto.request.MovimientoRequestDTO;
-import com.victorlh.registrocontable.movimientosservice.api.dto.response.MovimientoResponseDTO;
-import com.victorlh.registrocontable.movimientosservice.domain.conf.ETipoMovimiento;
-import com.victorlh.registrocontable.movimientosservice.domain.exceptions.FechaRepetidaException;
-import com.victorlh.registrocontable.movimientosservice.domain.model.Movimiento;
-import com.victorlh.registrocontable.movimientosservice.domain.model.MovimientoBuilder;
-import com.victorlh.registrocontable.movimientosservice.domain.service.MovimientosService;
-import com.victorlh.registrocontable.movimientosservice.mappers.MovimientosApiMapper;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping
@@ -38,11 +37,11 @@ public class MovimientosController {
 	@Autowired
 	private MovimientosApiMapper movimientosApiMapper;
 
-	@GetMapping({ "/", "" })
+	@GetMapping({"/", ""})
 	public List<MovimientoResponseDTO> listaMovimientos(@RequestParam(name = "tipoMovimiento", required = false) String tipoMovimientoId,
-			@RequestParam(name = "cuentaId", required = false) String cuentaId,
-			@RequestParam(value = "fromDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date fromDate,
-			@RequestParam(value = "toDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date toDate, Authentication auth) {
+	                                                    @RequestParam(name = "cuentaId", required = false) String cuentaId,
+	                                                    @RequestParam(value = "fromDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date fromDate,
+	                                                    @RequestParam(value = "toDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date toDate, Authentication auth) {
 		String uid = (String) auth.getPrincipal();
 
 		Optional<ETipoMovimiento> tipoMovimientoOpt = ETipoMovimiento.findById(tipoMovimientoId);
@@ -81,7 +80,7 @@ public class MovimientosController {
 
 	}
 
-	@PostMapping({ "/", "" })
+	@PostMapping({"/", ""})
 	public MovimientoResponseDTO crearMovimiento(@RequestBody MovimientoRequestDTO request, Authentication auth) {
 		String uid = (String) auth.getPrincipal();
 
