@@ -20,8 +20,10 @@ public interface MovimientosApiMapper {
 	List<MovimientoResponseDTO> listaMovimientosToListaMovimientosResponse(List<Movimiento> movimientos);
 
 	@Mapping(target = "movimientoContable", ignore = true)
-	@Mapping(target = "movimietosAsociados", ignore = true)
+	@Mapping(target = "movimientosAsociados", ignore = true)
 	@Mapping(target = "tipoMovimiento", source = "request.tipoMovimientoId", qualifiedByName = "idToTipoMovimiento")
+	@Mapping(target = "cuentaOrigenId", ignore = true)
+	@Mapping(target = "medioPagoOrigenId", ignore = true)
 	MovimientoBuilder movimientoRequestToMovimientoBuilder(MovimientoRequestDTO request);
 
 	@Named("idToTipoMovimiento")

@@ -17,12 +17,17 @@ public class Movimiento {
 	private String concepto;
 	private String nota;
 
+	private Cuenta cuentaOrigen;
+	private Cuenta cuentaDestino;
+
 	private boolean isMovimientoContable;
 
 	private Double capitalAnterior;
 	private Double capitalPosterior;
 
-	private List<Movimiento> movimietosAsociados;
+	private List<Movimiento> movimientosAsociados;
+
+	private Long idMovimientoTraspasoAsociado;
 
 	public Long getId() {
 		return id;
@@ -104,12 +109,12 @@ public class Movimiento {
 		this.capitalPosterior = capitalPosterior;
 	}
 
-	public List<Movimiento> getMovimietosAsociados() {
-		return movimietosAsociados;
+	public List<Movimiento> getMovimientosAsociados() {
+		return movimientosAsociados;
 	}
 
-	public void setMovimietosAsociados(List<Movimiento> movimietosAsociados) {
-		this.movimietosAsociados = movimietosAsociados;
+	public void setMovimientosAsociados(List<Movimiento> movimientosAsociados) {
+		this.movimientosAsociados = movimientosAsociados;
 	}
 
 	public Categoria getCategoria() {
@@ -128,4 +133,27 @@ public class Movimiento {
 		this.cuenta = cuenta;
 	}
 
+	public Cuenta getCuentaOrigen() {
+		return cuentaOrigen;
+	}
+
+	public void setCuentaOrigen(Cuenta cuentaOrigen) {
+		this.cuentaOrigen = cuentaOrigen;
+	}
+
+	public Cuenta getCuentaDestino() {
+		return cuentaDestino;
+	}
+
+	public void setCuentaDestino(Cuenta cuentaDestino) {
+		this.cuentaDestino = cuentaDestino;
+	}
+
+	public Long getIdMovimientoTraspasoAsociado() {
+		return idMovimientoTraspasoAsociado;
+	}
+
+	public void setIdMovimientoTraspasoAsociado(Long idMovimientoTraspasoAsociado) {
+		this.idMovimientoTraspasoAsociado = idMovimientoTraspasoAsociado;
+	}
 }

@@ -5,7 +5,7 @@ import com.victorlh.registrocontable.movimientosservice.domain.conf.ETipoMovimie
 import java.util.Date;
 import java.util.List;
 
-public class MovimientoBuilder {
+public class MovimientoBuilder implements Cloneable {
 
 	private Date fecha;
 	private ETipoMovimiento tipoMovimiento;
@@ -18,7 +18,11 @@ public class MovimientoBuilder {
 	private String nota;
 	private Boolean isMovimientoContable;
 
-	private List<Movimiento> movimietosAsociados;
+	private String cuentaDestinoId;
+	private String cuentaOrigenId;
+	private String medioPagoOrigenId;
+
+	private List<Movimiento> movimientosAsociados;
 
 	public Date getFecha() {
 		return fecha;
@@ -84,12 +88,12 @@ public class MovimientoBuilder {
 		this.nota = nota;
 	}
 
-	public List<Movimiento> getMovimietosAsociados() {
-		return movimietosAsociados;
+	public List<Movimiento> getMovimientosAsociados() {
+		return movimientosAsociados;
 	}
 
-	public void setMovimietosAsociados(List<Movimiento> movimietosAsociados) {
-		this.movimietosAsociados = movimietosAsociados;
+	public void setMovimientosAsociados(List<Movimiento> movimientosAsociados) {
+		this.movimientosAsociados = movimientosAsociados;
 	}
 
 	public Boolean isMovimientoContable() {
@@ -108,4 +112,37 @@ public class MovimientoBuilder {
 		this.subCategoriaId = subCategoriaId;
 	}
 
+	public String getCuentaDestinoId() {
+		return cuentaDestinoId;
+	}
+
+	public void setCuentaDestinoId(String cuentaDestinoId) {
+		this.cuentaDestinoId = cuentaDestinoId;
+	}
+
+	public String getCuentaOrigenId() {
+		return cuentaOrigenId;
+	}
+
+	public void setCuentaOrigenId(String cuentaOrigenId) {
+		this.cuentaOrigenId = cuentaOrigenId;
+	}
+
+	public String getMedioPagoOrigenId() {
+		return medioPagoOrigenId;
+	}
+
+	public void setMedioPagoOrigenId(String medioPagoOrigenId) {
+		this.medioPagoOrigenId = medioPagoOrigenId;
+	}
+
+	@Override
+	public MovimientoBuilder clone() {
+		try {
+			return (MovimientoBuilder) super.clone();
+		} catch (CloneNotSupportedException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 }

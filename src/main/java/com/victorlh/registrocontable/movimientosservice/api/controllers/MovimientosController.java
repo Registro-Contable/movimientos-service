@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,10 +33,13 @@ import java.util.Optional;
 @RequestMapping
 public class MovimientosController {
 
-	@Autowired
-	private MovimientosService movimientoService;
-	@Autowired
-	private MovimientosApiMapper movimientosApiMapper;
+	private final MovimientosService movimientoService;
+	private final MovimientosApiMapper movimientosApiMapper;
+
+	public MovimientosController(MovimientosService movimientoService, MovimientosApiMapper movimientosApiMapper) {
+		this.movimientoService = movimientoService;
+		this.movimientosApiMapper = movimientosApiMapper;
+	}
 
 	@GetMapping({"/", ""})
 	public List<MovimientoResponseDTO> listaMovimientos(@RequestParam(name = "tipoMovimiento", required = false) String tipoMovimientoId,
@@ -81,6 +85,7 @@ public class MovimientosController {
 	}
 
 	@PostMapping({"/", ""})
+	@Transactional(readOnly = false)
 	public MovimientoResponseDTO crearMovimiento(@RequestBody MovimientoRequestDTO request, Authentication auth) {
 		String uid = (String) auth.getPrincipal();
 
@@ -95,6 +100,7 @@ public class MovimientosController {
 	}
 
 	@PutMapping("/{id}")
+	@Transactional(readOnly = false)
 	public MovimientoResponseDTO modificarMovimiento(@PathVariable Long id, @RequestBody MovimientoRequestDTO request, Authentication auth) {
 		String uid = (String) auth.getPrincipal();
 
@@ -116,6 +122,7 @@ public class MovimientosController {
 	}
 
 	@DeleteMapping("/{id}")
+	@Transactional(readOnly = false)
 	public void borrarMovimiento(@PathVariable Long id, Authentication auth) {
 		String uid = (String) auth.getPrincipal();
 

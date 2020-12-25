@@ -1,13 +1,12 @@
 package com.victorlh.registrocontable.movimientosservice.infrastructure.entities;
 
-import java.util.Date;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.util.Date;
 
 @Entity
 @Table(name = "movimientos", schema = "movimientos")
@@ -38,8 +37,20 @@ public class MovimientoEntity {
 	@Column(name = "categoria_id")
 	private String categoriaId;
 
-	@Column(name = "suv_categoria_id")
+	@Column(name = "sub_categoria_id")
 	private String subCategoriaId;
+
+	@Column(name = "cuenta_destino_id")
+	private String cuentaDestinoId;
+
+	@Column(name = "cuenta_origen_id")
+	private String cuentaOrigenId;
+
+	@Column(name = "medio_pago_destino_id")
+	private String medioPagoDestinoId;
+
+	@Column(name = "medio_pago_origen_id")
+	private String medioPagoOrigenId;
 
 	@Column
 	private String concepto;
@@ -55,6 +66,9 @@ public class MovimientoEntity {
 
 	@Column(name = "capital_posterior")
 	private Double capitalPosterior;
+
+	@Column(name = "movimiento_traspaso_asociado")
+	private Long idMovimientoTraspasoAsociado;
 
 	public Long getId() {
 		return id;
@@ -168,4 +182,43 @@ public class MovimientoEntity {
 		this.subCategoriaId = subCategoriaId;
 	}
 
+	public String getCuentaDestinoId() {
+		return cuentaDestinoId;
+	}
+
+	public void setCuentaDestinoId(String cuentaDestinoId) {
+		this.cuentaDestinoId = cuentaDestinoId;
+	}
+
+	public String getCuentaOrigenId() {
+		return cuentaOrigenId;
+	}
+
+	public void setCuentaOrigenId(String cuentaOrigenId) {
+		this.cuentaOrigenId = cuentaOrigenId;
+	}
+
+	public String getMedioPagoDestinoId() {
+		return medioPagoDestinoId;
+	}
+
+	public void setMedioPagoDestinoId(String medioPagoDestinoId) {
+		this.medioPagoDestinoId = medioPagoDestinoId;
+	}
+
+	public String getMedioPagoOrigenId() {
+		return medioPagoOrigenId;
+	}
+
+	public void setMedioPagoOrigenId(String medioPagoOrigenId) {
+		this.medioPagoOrigenId = medioPagoOrigenId;
+	}
+
+	public Long getIdMovimientoTraspasoAsociado() {
+		return idMovimientoTraspasoAsociado;
+	}
+
+	public void setIdMovimientoTraspasoAsociado(Long idMovimientoTraspasoAsociado) {
+		this.idMovimientoTraspasoAsociado = idMovimientoTraspasoAsociado;
+	}
 }

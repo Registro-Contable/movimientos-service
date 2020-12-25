@@ -13,7 +13,7 @@
 
 	<groupId>com.victorlh.registrocontable</groupId>
 	<artifactId>movimientos-service</artifactId>
-	<version>0.0.8-SNAPSHOT</version>
+	<version>0.0.9-SNAPSHOT</version>
 
 	<name>registrocontable-movimientos-service</name>
 	<description>Servicio de gestion de movimientos</description>

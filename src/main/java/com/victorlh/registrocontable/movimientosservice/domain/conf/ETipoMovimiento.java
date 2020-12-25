@@ -11,7 +11,7 @@ public enum ETipoMovimiento {
 			ETipoMovimiento tipo = valueOf(id);
 			return Optional.of(tipo);
 		} catch (Throwable e) {
-			return Optional.ofNullable(null);
+			return Optional.empty();
 		}
 	}
 }

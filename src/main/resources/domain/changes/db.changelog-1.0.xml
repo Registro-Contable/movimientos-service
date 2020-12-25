@@ -1,66 +1,143 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <databaseChangeLog
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
-	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd
-    http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+		xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
 
 	<changeSet author="victorlh"
-		id="movimientos-service-20201107-001">
+	           id="movimientos-service-20201107-001">
 		<createTable tableName="movimientos"
-			schemaName="movimientos">
+		             schemaName="movimientos">
 			<column autoIncrement="true" name="id" type="SERIAL">
-				<constraints primaryKey="true" />
+				<constraints primaryKey="true"/>
 			</column>
 			<column name="fecha" type="TIMESTAMP">
-				<constraints nullable="false" />
+				<constraints nullable="false"/>
 			</column>
 			<column name="tipo_movimiento_id" type="VARCHAR(30)">
-				<constraints nullable="false" />
+				<constraints nullable="false"/>
 			</column>
 			<column name="uid" type="VARCHAR(255)">
-				<constraints nullable="false" />
+				<constraints nullable="false"/>
 			</column>
-			<column name="cuenta_id" type="VARCHAR(255)" />
-			<column name="medio_pago_id" type="VARCHAR(255)" />
+			<column name="cuenta_id" type="VARCHAR(255)"/>
+			<column name="medio_pago_id" type="VARCHAR(255)"/>
 			<column name="cantidad" type="CURRENCY">
-				<constraints nullable="false" />
+				<constraints nullable="false"/>
 			</column>
-			<column name="categoria_id" type="VARCHAR(255)" />
-			<column name="concepto" type="VARCHAR(255)" />
-			<column name="nota" type="VARCHAR" />
+			<column name="categoria_id" type="VARCHAR(255)"/>
+			<column name="concepto" type="VARCHAR(255)"/>
+			<column name="nota" type="VARCHAR"/>
 			<column name="is_movimiento_contable" type="BOOLEAN">
-				<constraints nullable="false" />
+				<constraints nullable="false"/>
 			</column>
-			<column name="capital_previo" type="CURRENCY" />
-			<column name="capital_posterior" type="CURRENCY" />
+			<column name="capital_previo" type="CURRENCY"/>
+			<column name="capital_posterior" type="CURRENCY"/>
 		</createTable>
 		<rollback>
-			<dropTable tableName="movimientos" schemaName="movimientos" />
+			<dropTable tableName="movimientos" schemaName="movimientos"/>
 		</rollback>
 	</changeSet>
 
 	<changeSet author="victorlh"
-		id="movimientos-service-20201114-001">
+	           id="movimientos-service-20201114-001">
 		<addUniqueConstraint
-			constraintName="uk_movimientos_fecha" columnNames="fecha"
-			tableName="movimientos" schemaName="movimientos" />
+				constraintName="uk_movimientos_fecha" columnNames="fecha"
+				tableName="movimientos" schemaName="movimientos"/>
 		<rollback>
 			<dropUniqueConstraint
-				constraintName="uk_movimientos_fecha" tableName="movimientos"
-				schemaName="movimientos" />
+					constraintName="uk_movimientos_fecha" tableName="movimientos"
+					schemaName="movimientos"/>
 		</rollback>
 	</changeSet>
 
 	<changeSet author="victorlh"
-		id="movimientos-service-20201206-001">
+	           id="movimientos-service-20201206-001">
 		<addColumn tableName="movimientos" schemaName="movimientos">
-			<column name="suv_categoria_id" type="VARCHAR(255)" />
+			<column name="suv_categoria_id" type="VARCHAR(255)"/>
 		</addColumn>
 		<rollback>
 			<dropColumn tableName="movimientos"
-				schemaName="movimientos" columnName="suv_categoria_id" />
+			            schemaName="movimientos" columnName="suv_categoria_id"/>
+		</rollback>
+	</changeSet>
+
+	<changeSet author="victorlh" id="movimientos-service-20201224-001">
+		<renameColumn tableName="movimientos" schemaName="movimientos" oldColumnName="suv_categoria_id"
+		              newColumnName="sub_categoria_id"/>
+		<rollback>
+			<renameColumn tableName="movimientos" schemaName="movimientos" oldColumnName="sub_categoria_id"
+			              newColumnName="suv_categoria_id"/>
+		</rollback>
+	</changeSet>
+
+	<changeSet author="victorlh" id="movimientos-service-20201224-002">
+		<addColumn tableName="movimientos" schemaName="movimientos">
+			<column name="cuenta_destino" type="VARCHAR(255)"/>
+			<column name="cuenta_origen" type="VARCHAR(255)"/>
+		</addColumn>
+		<rollback>
+			<dropColumn tableName="movimientos"
+			            schemaName="movimientos" columnName="cuenta_destino"/>
+			<dropColumn tableName="movimientos"
+			            schemaName="movimientos" columnName="cuenta_origen"/>
+		</rollback>
+	</changeSet>
+
+	<changeSet author="victorlh" id="movimientos-service-20201224-003">
+		<renameColumn tableName="movimientos" schemaName="movimientos" oldColumnName="cuenta_destino"
+		              newColumnName="cuenta_destino_id"/>
+		<renameColumn tableName="movimientos" schemaName="movimientos" oldColumnName="cuenta_origen"
+		              newColumnName="cuenta_origen_id"/>
+		<rollback>
+			<renameColumn tableName="movimientos" schemaName="movimientos" oldColumnName="cuenta_destino_id"
+			              newColumnName="cuenta_destino"/>
+			<renameColumn tableName="movimientos" schemaName="movimientos" oldColumnName="cuenta_origen_id"
+			              newColumnName="cuenta_origen"/>
+		</rollback>
+	</changeSet>
+
+	<changeSet author="victorlh" id="movimientos-service-20201224-004">
+		<addColumn tableName="movimientos" schemaName="movimientos">
+			<column name="medio_pago_destino_id" type="VARCHAR(255)"/>
+			<column name="medio_pago_origen_id" type="VARCHAR(255)"/>
+		</addColumn>
+		<rollback>
+			<dropColumn tableName="movimientos"
+			            schemaName="movimientos" columnName="medio_pago_destino_id"/>
+			<dropColumn tableName="movimientos"
+			            schemaName="movimientos" columnName="medio_pago_origen_id"/>
+		</rollback>
+	</changeSet>
+
+	<changeSet author="victorlh" id="movimientos-service-20201224-005">
+		<addColumn tableName="movimientos" schemaName="movimientos">
+			<column name="movimiento_traspaso_asociado" type="BIGINT">
+				<constraints nullable="true" foreignKeyName="fk_movimiento_traspaso_asociado"
+				             references="movimientos.movimientos(id)"/>
+			</column>
+		</addColumn>
+		<rollback>
+			<dropColumn tableName="movimientos"
+			            schemaName="movimientos" columnName="movimiento_traspaso_asociado"/>
+		</rollback>
+	</changeSet>
+
+	<changeSet author="victorlh"
+	           id="movimientos-service-20201224-006">
+		<dropUniqueConstraint
+				constraintName="uk_movimientos_fecha" tableName="movimientos"
+				schemaName="movimientos"/>
+		<addUniqueConstraint
+				constraintName="uk_movimientos_fecha" columnNames="cuenta_id,fecha"
+				tableName="movimientos" schemaName="movimientos"/>
+		<rollback>
+			<dropUniqueConstraint
+					constraintName="uk_movimientos_fecha" tableName="movimientos"
+					schemaName="movimientos"/>
+			<addUniqueConstraint
+					constraintName="uk_movimientos_fecha" columnNames="fecha"
+					tableName="movimientos" schemaName="movimientos"/>
 		</rollback>
 	</changeSet>
 

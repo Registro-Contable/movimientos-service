@@ -17,6 +17,9 @@ public class MovimientoResponseDTO {
 	private String concepto;
 	private String nota;
 
+	private CuentaResponseDTO cuentaDestino;
+	private CuentaResponseDTO cuentaOrigen;
+
 	private boolean isMovimientoContable;
 
 	private Double capitalAnterior;
@@ -118,4 +121,19 @@ public class MovimientoResponseDTO {
 		this.capitalPosterior = capitalPosterior;
 	}
 
+	public CuentaResponseDTO getCuentaDestino() {
+		return cuentaDestino;
+	}
+
+	public void setCuentaDestino(CuentaResponseDTO cuentaDestino) {
+		this.cuentaDestino = cuentaDestino;
+	}
+
+	public CuentaResponseDTO getCuentaOrigen() {
+		return cuentaOrigen;
+	}
+
+	public void setCuentaOrigen(CuentaResponseDTO cuentaOrigen) {
+		this.cuentaOrigen = cuentaOrigen;
+	}
 }

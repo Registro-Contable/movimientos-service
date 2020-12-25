@@ -16,6 +16,8 @@ public class MovimientoRequestDTO {
 	private double cantidad;
 	private String concepto;
 	private String nota;
+	private String cuentaDestinoId;
+	//	private String medioPagoDestinoId;
 
 	public Date getFecha() {
 		return fecha;
@@ -87,6 +89,14 @@ public class MovimientoRequestDTO {
 
 	public void setSubCategoriaId(String subCategoriaId) {
 		this.subCategoriaId = subCategoriaId;
+	}
+
+	public String getCuentaDestinoId() {
+		return cuentaDestinoId;
+	}
+
+	public void setCuentaDestinoId(String cuentaDestinoId) {
+		this.cuentaDestinoId = cuentaDestinoId;
 	}
 
 }

@@ -23,10 +23,12 @@ public interface MovimientosEntityMapper {
 	@Mapping(target = "uid", source = "entity.uid")
 	@Mapping(target = "capitalAnterior", source = "entity.capitalPrevio")
 	@Mapping(target = "tipoMovimiento", source = "entity.tipoMovimientoId", qualifiedByName = "idToTipoMovimiento")
-	@Mapping(target = "movimietosAsociados", ignore = true)
-	@Mapping(target = "cuenta", source = "cuenta")
-	@Mapping(target = "categoria", source = "categoria")
-	Movimiento movimientoEntityToMovimiento(MovimientoEntity entity, Cuenta cuenta, Categoria categoria);
+	@Mapping(target = "movimientosAsociados", ignore = true)
+	@Mapping(target = "cuenta", ignore = true)
+	@Mapping(target = "categoria", ignore = true)
+	@Mapping(target = "cuentaOrigen", ignore = true)
+	@Mapping(target = "cuentaDestino", ignore = true)
+	Movimiento movimientoEntityToMovimiento(MovimientoEntity entity);
 
 	@Mapping(target = "cuentaId", source = "dto.id")
 	@Mapping(target = "uid", source = "dto.uid")
@@ -50,6 +52,8 @@ public interface MovimientosEntityMapper {
 	@Mapping(target = "capitalPosterior", ignore = true)
 	@Mapping(target = "capitalPrevio", ignore = true)
 	@Mapping(target = "tipoMovimientoId", source = "builder.tipoMovimiento")
+	@Mapping(target = "idMovimientoTraspasoAsociado", ignore = true)
+	@Mapping(target = "medioPagoDestinoId", ignore = true)
 	MovimientoEntity movimientoBuilderToMovimientoEntity(MovimientoBuilder builder);
 
 	@Named("idToTipoMovimiento")

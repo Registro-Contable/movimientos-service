@@ -25,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -36,14 +37,18 @@ public class MovimientosServiceImpl implements MovimientosService {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(MovimientosServiceImpl.class);
 
+	private final MovimientosRepository movimientosRepository;
+	private final MovimientosEntityMapper movimientosEntityMapper;
+	private final CuentasFeign cuentasFeign;
+	private final CategoriasFeign categoriasFeign;
+
 	@Autowired
-	private MovimientosRepository movimientosRepository;
-	@Autowired
-	private MovimientosEntityMapper movimientosEntityMapper;
-	@Autowired
-	private CuentasFeign cuentasFeign;
-	@Autowired
-	private CategoriasFeign categoriasFeign;
+	public MovimientosServiceImpl(MovimientosRepository movimientosRepository, MovimientosEntityMapper movimientosEntityMapper, CuentasFeign cuentasFeign, CategoriasFeign categoriasFeign) {
+		this.movimientosRepository = movimientosRepository;
+		this.movimientosEntityMapper = movimientosEntityMapper;
+		this.cuentasFeign = cuentasFeign;
+		this.categoriasFeign = categoriasFeign;
+	}
 
 	@Override
 	public List<Movimiento> getMovimientosUsuario(String uid, Date fromDate, Date toDate) {
@@ -91,10 +96,53 @@ public class MovimientosServiceImpl implements MovimientosService {
 
 	@Override
 	public Movimiento nuevoMovimiento(String uid, MovimientoBuilder builder) {
+		ETipoMovimiento tipoMovimiento = builder.getTipoMovimiento();
+		Movimiento movimientoDestino = null;
+		if (tipoMovimiento == ETipoMovimiento.TRASPASO) {
+			MovimientoBuilder builderDestino = builder.clone();
+			builderDestino.setCuentaDestinoId(null);
+
+			builderDestino.setCuentaOrigenId(builder.getCuentaId());
+			builderDestino.setMedioPagoOrigenId(builder.getMedioPagoId());
+
+			builderDestino.setCuentaId(builder.getCuentaDestinoId());
+			builderDestino.setMedioPagoId(null);
+			movimientoDestino = nuevoMovimientoUnico(uid, builderDestino);
+
+			builder.setCantidad(builder.getCantidad() * -1);
+		}
+
+		Movimiento movimiento = nuevoMovimientoUnico(uid, builder);
+
+		if (movimientoDestino != null) {
+			Optional<MovimientoEntity> destinoEntityOpt = movimientosRepository.findById(movimientoDestino.getId());
+			MovimientoEntity destinoEntity = destinoEntityOpt.orElseThrow(IllegalAccessError::new);
+			destinoEntity.setIdMovimientoTraspasoAsociado(movimiento.getId());
+			movimientosRepository.save(destinoEntity);
+
+
+			Optional<MovimientoEntity> movimientoEntityOpt = movimientosRepository.findById(movimiento.getId());
+			MovimientoEntity movimientoEntity = movimientoEntityOpt.orElseThrow(IllegalAccessError::new);
+			movimientoEntity.setIdMovimientoTraspasoAsociado(movimientoDestino.getId());
+			movimientosRepository.save(movimientoEntity);
+
+			movimiento.setIdMovimientoTraspasoAsociado(movimientoDestino.getId());
+		}
+
+		return movimiento;
+	}
+
+	private Movimiento nuevoMovimientoUnico(String uid, MovimientoBuilder builder) {
 		if (builder.isMovimientoContable() == null) {
-			MedioPagoResponseDTO medioPagoDetalles = cuentasFeign.medioPagoDetalles(builder.getCuentaId(), builder.getMedioPagoId());
-			TipoMedioPagoResponseDTO tipoMedioPago = medioPagoDetalles.getTipoMedioPago();
-			builder.setMovimientoContable(tipoMedioPago.isMovimientoContable());
+			String cuentaId = builder.getCuentaId();
+			String medioPagoId = builder.getMedioPagoId();
+			if (StringUtils.isNotBlank(cuentaId) && StringUtils.isNotBlank(medioPagoId)) {
+				MedioPagoResponseDTO medioPagoDetalles = cuentasFeign.medioPagoDetalles(cuentaId, medioPagoId);
+				TipoMedioPagoResponseDTO tipoMedioPago = medioPagoDetalles.getTipoMedioPago();
+				builder.setMovimientoContable(tipoMedioPago.isMovimientoContable());
+			} else {
+				builder.setMovimientoContable(true);
+			}
 		}
 
 		MovimientoEntity entity = movimientosEntityMapper.movimientoBuilderToMovimientoEntity(builder);
@@ -104,9 +152,7 @@ public class MovimientosServiceImpl implements MovimientosService {
 
 		List<MovimientoEntity> posterioresEntities = movimientosRepository.findByCuentaIdAndFechaGreaterThanOrderByFechaAsc(entity.getCuentaId(),
 				entity.getFecha());
-		posterioresEntities.forEach(e -> {
-			updateCapitalAndSave(e);
-		});
+		posterioresEntities.forEach(this::updateCapitalAndSave);
 
 		return getFullDataMovimientos(entity);
 	}
@@ -117,16 +163,18 @@ public class MovimientosServiceImpl implements MovimientosService {
 		LOGGER.trace("Medio pago igual: {}", StringUtils.equals(movimiento.getCuenta().getMedioPago().getMedioPagoId(), builder.getMedioPagoId()));
 		LOGGER.trace("Fecha igual: {}", movimiento.getFecha().getTime() == builder.getFecha().getTime());
 		LOGGER.trace("Tipo igual: {}", movimiento.getTipoMovimiento() == builder.getTipoMovimiento());
+		LOGGER.trace("Tipo traspaso: {}", movimiento.getTipoMovimiento() == ETipoMovimiento.TRASPASO);
 
 		if (!StringUtils.equals(movimiento.getCuenta().getCuentaId(), builder.getCuentaId())
 				|| !StringUtils.equals(movimiento.getCuenta().getMedioPago().getMedioPagoId(), builder.getMedioPagoId())
-				|| movimiento.getFecha().getTime() != builder.getFecha().getTime() || movimiento.getTipoMovimiento() != builder.getTipoMovimiento()) {
+				|| movimiento.getFecha().getTime() != builder.getFecha().getTime() || movimiento.getTipoMovimiento() != builder.getTipoMovimiento()
+				|| movimiento.getTipoMovimiento() == ETipoMovimiento.TRASPASO) {
 			borrarMovimiento(movimiento);
 			return nuevoMovimiento(movimiento.getUid(), builder);
 		}
 
 		Optional<MovimientoEntity> entityOpt = movimientosRepository.findById(movimiento.getId());
-		MovimientoEntity entity = entityOpt.get();
+		MovimientoEntity entity = entityOpt.orElseThrow(IllegalAccessError::new);
 
 		entity.setCategoriaId(builder.getCategoriaId());
 		entity.setSubCategoriaId(builder.getSubCategoriaId());
@@ -140,9 +188,7 @@ public class MovimientosServiceImpl implements MovimientosService {
 
 			List<MovimientoEntity> posterioresEntities = movimientosRepository.findByCuentaIdAndFechaGreaterThanOrderByFechaAsc(entity.getCuentaId(),
 					entity.getFecha());
-			posterioresEntities.forEach(e -> {
-				updateCapitalAndSave(e);
-			});
+			posterioresEntities.forEach(this::updateCapitalAndSave);
 		} else {
 			entity = movimientosRepository.save(entity);
 		}
@@ -152,13 +198,20 @@ public class MovimientosServiceImpl implements MovimientosService {
 
 	@Override
 	public void borrarMovimiento(Movimiento movimiento) {
+		Long idMovimientoTraspasoAsociado = movimiento.getIdMovimientoTraspasoAsociado();
+		if (idMovimientoTraspasoAsociado != null) {
+			Optional<Movimiento> movimientoAsociado = getMovimiento(idMovimientoTraspasoAsociado);
+			movimientoAsociado.ifPresent(this::borrarMovimientoUnico);
+		}
+		borrarMovimientoUnico(movimiento);
+	}
+
+	private void borrarMovimientoUnico(Movimiento movimiento) {
 		movimientosRepository.deleteById(movimiento.getId());
 
 		List<MovimientoEntity> posterioresEntities = movimientosRepository
 				.findByCuentaIdAndFechaGreaterThanOrderByFechaAsc(movimiento.getCuenta().getCuentaId(), movimiento.getFecha());
-		posterioresEntities.forEach(e -> {
-			updateCapitalAndSave(e);
-		});
+		posterioresEntities.forEach(this::updateCapitalAndSave);
 	}
 
 	private MovimientoEntity updateCapitalAndSave(MovimientoEntity entity) {
@@ -180,16 +233,45 @@ public class MovimientosServiceImpl implements MovimientosService {
 	}
 
 	private Date minDate() {
-		return new GregorianCalendar(1900, 0, 1).getTime();
+		return new GregorianCalendar(1900, Calendar.JANUARY, 1).getTime();
 	}
 
 	private Date maxDate() {
-		return new GregorianCalendar(2900, 11, 31).getTime();
+		return new GregorianCalendar(2900, Calendar.DECEMBER, 31).getTime();
 	}
 
 	private Movimiento getFullDataMovimientos(MovimientoEntity entity) {
 		String cuentaId = entity.getCuentaId();
-		CuentaResponseDTO detallesCuenta = null;
+		String medioPagoId = entity.getMedioPagoId();
+		Cuenta cuenta = getCuenta(cuentaId, medioPagoId);
+
+		String categoriaId = entity.getCategoriaId();
+		String subCategoriaId = entity.getSubCategoriaId();
+		Categoria categoria = getCategoria(categoriaId, subCategoriaId);
+
+		Movimiento movimiento = movimientosEntityMapper.movimientoEntityToMovimiento(entity);
+		movimiento.setCuenta(cuenta);
+		movimiento.setCategoria(categoria);
+
+		String cuentaOrigenId = entity.getCuentaOrigenId();
+		if (StringUtils.isNotBlank(cuentaOrigenId)) {
+			String medioPagoOrigenId = entity.getMedioPagoOrigenId();
+			Cuenta cuentaOrigen = getCuenta(cuentaOrigenId, medioPagoOrigenId);
+			movimiento.setCuentaOrigen(cuentaOrigen);
+		}
+
+		String cuentaDestinoId = entity.getCuentaDestinoId();
+		if (StringUtils.isNotBlank(cuentaDestinoId)) {
+			String medioPagoDestinoId = entity.getMedioPagoDestinoId();
+			Cuenta cuentaDestino = getCuenta(cuentaDestinoId, medioPagoDestinoId);
+			movimiento.setCuentaDestino(cuentaDestino);
+		}
+
+		return movimiento;
+	}
+
+	private Cuenta getCuenta(String cuentaId, String medioPagoId) {
+		CuentaResponseDTO detallesCuenta;
 		try {
 			detallesCuenta = cuentasFeign.detalles(cuentaId);
 		} catch (FeignException e) {
@@ -203,14 +285,14 @@ public class MovimientosServiceImpl implements MovimientosService {
 
 		Optional<MedioPagoResponseDTO> medioPagoOpt = detallesCuenta.getMediosPago()
 				.stream()
-				.filter(mp -> StringUtils.equals(entity.getMedioPagoId(), mp.getId()))
+				.filter(mp -> StringUtils.equals(medioPagoId, mp.getId()))
 				.findFirst();
 		MedioPagoResponseDTO medioPago = medioPagoOpt.orElse(null);
-		Cuenta cuenta = movimientosEntityMapper.cuentaResponseDtoToCuenta(detallesCuenta, medioPago);
+		return movimientosEntityMapper.cuentaResponseDtoToCuenta(detallesCuenta, medioPago);
+	}
 
-		String categoriaId = entity.getCategoriaId();
-		CategoriaResponse detallesCategoria = null;
-
+	private Categoria getCategoria(String categoriaId, String subCategoriaId) {
+		CategoriaResponse detallesCategoria;
 		try {
 			detallesCategoria = categoriasFeign.detalles(categoriaId);
 		} catch (FeignException e) {
@@ -219,18 +301,16 @@ public class MovimientosServiceImpl implements MovimientosService {
 				LOGGER.error(e.getLocalizedMessage(), e);
 			}
 			detallesCategoria = new CategoriaResponse();
-			detallesCategoria.setId(cuentaId);
+			detallesCategoria.setId(categoriaId);
 		}
 
 		Optional<SubCategoriaResponse> subCategoriaOpt = detallesCategoria.getSubCategorias()
 				.stream()
-				.filter(sc -> StringUtils.equals(entity.getSubCategoriaId(), sc.getId()))
+				.filter(sc -> StringUtils.equals(subCategoriaId, sc.getId()))
 				.findFirst();
 		SubCategoriaResponse subCategoria = subCategoriaOpt.orElse(null);
 
-		Categoria categoria = movimientosEntityMapper.categoriaResponseDtoToCategoria(detallesCategoria, subCategoria);
-
-		return movimientosEntityMapper.movimientoEntityToMovimiento(entity, cuenta, categoria);
+		return movimientosEntityMapper.categoriaResponseDtoToCategoria(detallesCategoria, subCategoria);
 	}
 
 }
